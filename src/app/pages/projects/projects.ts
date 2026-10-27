@@ -23,14 +23,14 @@ type Sort = 'recent' | 'name' | 'progress' | 'due';
   template: `
     <app-topbar><span class="current">Inicio</span></app-topbar>
 
-    <main class="page" [class.motion]="intro">
+    <main class="page flow" [class.motion]="intro">
       <!-- Saludo -->
       <section class="hero">
         <div class="intro">
-          <span class="tag">Espacio de trabajo</span>
+          <span class="tag live">Espacio de trabajo · en vivo</span>
           <h1>
             <span class="rv"><span style="--i: 0">{{ greeting() }},</span></span><span class="rv"><span style="--i: 1">{{ firstName() }}.</span></span>
-            <span class="tone"><span class="rv"><span style="--i: 3">Esto</span></span><span class="rv"><span style="--i: 4">es</span></span><span class="rv"><span style="--i: 5">lo</span></span><span class="rv"><span style="--i: 6">que</span></span><span class="rv"><span style="--i: 7">viene.</span></span></span>
+            <span class="tone glint"><span class="rv"><span style="--i: 3">Esto</span></span><span class="rv"><span style="--i: 4">es</span></span><span class="rv"><span style="--i: 5">lo</span></span><span class="rv"><span style="--i: 6">que</span></span><span class="rv"><span style="--i: 7">viene.</span></span></span>
           </h1>
         </div>
         <div class="actions">
@@ -239,7 +239,7 @@ type Sort = 'recent' | 'name' | 'progress' | 'due';
 
     <ng-template #row let-i>
       <a class="arow" [routerLink]="['/p', i.project.id]">
-        <span class="dot" [style.background]="i.project.color"></span>
+        <span class="dot" [class.live-dot]="isLate(i)" [style.background]="i.project.color"></span>
         <span class="atext">
           <span class="aname">{{ i.task.name }}</span>
           <span class="aproj">{{ i.project.name }}{{ i.task.assignee ? ' · ' + i.task.assignee : '' }}</span>
@@ -331,11 +331,39 @@ type Sort = 'recent' | 'name' | 'progress' | 'due';
       small { font-size: 12.5px; color: var(--text-3); }
       .bad { color: var(--danger); }
       &.dark {
+        position: relative; overflow: hidden; isolation: isolate;
         background: var(--ink); border-color: var(--ink); color: #fff;
         .eyebrow { color: rgba(255, 255, 255, 0.6); }
         .progress { height: 6px; background: rgba(255, 255, 255, 0.15); }
+        /* Luz cobre que flota dentro de la tarjeta y un destello que la cruza */
+        &::before {
+          content: ''; position: absolute; z-index: -1; right: -20%; top: -60%;
+          width: 60%; aspect-ratio: 1; border-radius: 50%;
+          background: radial-gradient(circle, rgba(214, 125, 64, 0.45), transparent 65%);
+          filter: blur(18px);
+        }
+        &::after {
+          content: ''; position: absolute; inset: 0; z-index: -1;
+          background: linear-gradient(100deg, transparent 35%, rgba(255, 255, 255, 0.08) 50%, transparent 65%);
+          transform: translateX(-100%);
+        }
       }
     }
+    @media (prefers-reduced-motion: no-preference) {
+      .kpi.dark::before { animation: glow-drift 12s ease-in-out infinite alternate; }
+      .kpi.dark::after { animation: sweep 7s ease-in-out 2s infinite; }
+    }
+    @keyframes glow-drift {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-60%, 50%) scale(1.25); }
+      100% { transform: translate(-120%, 10%) scale(0.9); }
+    }
+    @keyframes sweep {
+      0% { transform: translateX(-100%); }
+      30%, 100% { transform: translateX(100%); }
+    }
+    /* Agenda: el punto de las vencidas late en rojo */
+    .arow .live-dot { --halo: var(--danger); }
 
     /* ---------- Cuerpo en dos columnas ---------- */
     .main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 400px); gap: 20px; align-items: start; }

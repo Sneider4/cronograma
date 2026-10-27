@@ -26,7 +26,7 @@ type Mode = 'in' | 'up' | 'forgot';
         <div class="brand">
           <svg class="mark" viewBox="0 0 20 20" aria-hidden="true">
             <rect width="20" height="20" rx="6" fill="currentColor" />
-            <path d="M5 6.5h6M7.5 10h7M10 13.5h5" stroke="var(--surface)" stroke-width="2" stroke-linecap="round" />
+            <path class="draw" pathLength="1" d="M5 6.5h6M7.5 10h7M10 13.5h5" stroke="var(--surface)" stroke-width="2" stroke-linecap="round" />
           </svg>
           <span>Cronograma</span>
         </div>
@@ -140,7 +140,7 @@ type Mode = 'in' | 'up' | 'forgot';
           <span class="m-brand">
             <svg viewBox="0 0 20 20" aria-hidden="true">
               <rect width="20" height="20" rx="6" fill="currentColor" />
-              <path d="M5 6.5h6M7.5 10h7M10 13.5h5" stroke="#e6e8ec" stroke-width="2" stroke-linecap="round" />
+              <path class="draw" pathLength="1" d="M5 6.5h6M7.5 10h7M10 13.5h5" stroke="#e6e8ec" stroke-width="2" stroke-linecap="round" />
             </svg>
             Cronograma
           </span>
@@ -179,12 +179,16 @@ type Mode = 'in' | 'up' | 'forgot';
         <h2 style="--d: 450ms">
           <span class="rv"><span style="--i: 0">Planea</span></span><span class="rv"><span style="--i: 1">desde</span></span><span class="rv"><span style="--i: 2">cero,</span></span><br />
           <span class="rv"><span style="--i: 3">entregando</span></span><span class="rv"><span style="--i: 4">solo</span></span><br />
-          <span class="tone"><span class="rv"><span style="--i: 6">lo</span></span><span class="rv"><span style="--i: 7">que</span></span><span class="rv"><span style="--i: 8">importa.</span></span></span>
+          <span class="tone glint"><span class="rv"><span style="--i: 6">lo</span></span><span class="rv"><span style="--i: 7">que</span></span><span class="rv"><span style="--i: 8">importa.</span></span></span>
         </h2>
 
-        <div class="giant">CRONOGRAMA</div>
+        <div class="giant">
+          @for (l of giant; track $index) {
+            <span [style.--i]="$index">{{ l }}</span>
+          }
+        </div>
         <div class="strip">
-          <span>• Tiempo real</span>
+          <span><i class="live-dot"></i> Tiempo real</span>
           <span>• Hecho para equipos</span>
           <span>• Excel incluido</span>
         </div>
@@ -369,7 +373,33 @@ type Mode = 'in' | 'up' | 'forgot';
         radial-gradient(70% 55% at 70% 18%, rgba(255, 255, 255, 0.75), transparent 70%),
         linear-gradient(180deg, #e6e8ec 0%, #d5d8dd 100%);
       color: #0b0b0c;
+      isolation: isolate;
+      /* Dos luces (cobre y blanca) que flotan detras del contenido */
+      &::before,
+      &::after {
+        content: '';
+        position: absolute;
+        z-index: -1;
+        width: 70%;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        filter: blur(30px);
+        pointer-events: none;
+      }
+      &::before {
+        left: -20%;
+        top: 30%;
+        background: radial-gradient(circle, rgba(214, 125, 64, 0.38), transparent 65%);
+        animation: drift-a 16s ease-in-out infinite alternate;
+      }
+      &::after {
+        right: -25%;
+        top: -15%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.85), transparent 65%);
+        animation: drift-b 20s ease-in-out infinite alternate;
+      }
     }
+    .strip .live-dot { margin-right: 4px; vertical-align: 1px; }
     .top {
       display: flex;
       justify-content: space-between;
@@ -469,7 +499,7 @@ type Mode = 'in' | 'up' | 'forgot';
       font-weight: 500;
       line-height: 0.98;
       letter-spacing: -0.06em;
-      .tone { color: #8d9097; }
+      .tone { color: #8d9097; --glint-base: #8d9097; }
     }
 
     .pills {
@@ -523,20 +553,23 @@ type Mode = 'in' | 'up' | 'forgot';
       line-height: 1;
       letter-spacing: -0.07em;
       white-space: nowrap;
-      /* Capa 1: franja cobre que barre la palabra. Capa 2: el degradado base. */
-      background:
-        linear-gradient(100deg, transparent 42%, rgba(232, 150, 88, 0.95) 49%, rgba(194, 101, 42, 0.95) 51%, transparent 58%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(11, 11, 12, 0.85) 75%);
-      background-size: 250% 100%, 100% 100%;
-      background-position: 150% 0, 0 0;
-      background-repeat: no-repeat;
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
       pointer-events: none;
-      animation:
-        gather 1.3s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s both,
-        shine 7s ease-in-out 2.2s infinite;
+      z-index: 1;
+      animation: gather 1.3s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s both;
+      /* Cada letra lleva su degradado; la franja cobre la cruza en ola, letra por letra. */
+      span {
+        display: inline-block;
+        background:
+          linear-gradient(100deg, transparent 38%, rgba(236, 156, 96, 0.95) 48%, rgba(194, 101, 42, 0.95) 54%, transparent 64%),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(11, 11, 12, 0.85) 75%);
+        background-size: 300% 100%, 100% 100%;
+        background-position: 150% 0, 0 0;
+        background-repeat: no-repeat;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: wave 6s ease-in-out calc(2s + var(--i) * 75ms) infinite both;
+      }
     }
     .strip {
       position: absolute;
@@ -560,16 +593,38 @@ type Mode = 'in' | 'up' | 'forgot';
     @keyframes gather {
       from { opacity: 0; letter-spacing: 0.12em; filter: blur(8px); transform: translateY(12%); }
     }
-    /* El brillo cruza en el primer 30% del ciclo y luego descansa */
-    @keyframes shine {
-      0% { background-position: 150% 0, 0 0; }
-      30%, 100% { background-position: -50% 0, 0 0; }
+    /* Ola: la letra sube un poco mientras la cruza el cobre; luego descansa el resto del ciclo */
+    @keyframes wave {
+      0% { transform: none; background-position: 150% 0, 0 0; }
+      9% { transform: translateY(-7%); }
+      18% { transform: none; }
+      24%, 100% { transform: none; background-position: -50% 0, 0 0; }
+    }
+    /* Luces de fondo del panel que derivan lento */
+    @keyframes drift-a {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(28%, -18%) scale(1.15); }
+      100% { transform: translate(-10%, 12%) scale(0.95); }
+    }
+    @keyframes drift-b {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-30%, 16%) scale(0.9); }
+      100% { transform: translate(12%, -10%) scale(1.1); }
+    }
+    /* Logo: las tres barras se dibujan como un mini Gantt y se borran */
+    @keyframes draw {
+      0% { stroke-dashoffset: 1; }
+      35%, 75% { stroke-dashoffset: 0; }
+      100% { stroke-dashoffset: -1; }
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .draw { stroke-dasharray: 1; animation: draw 5s cubic-bezier(0.6, 0, 0.3, 1) 1s infinite both; }
     }
     @keyframes fill { from { transform: scaleX(0); } }
     @keyframes sheen { 0% { transform: translateX(-120%); } 55%, 100% { transform: translateX(120%); } }
     @keyframes nudge { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(6px); } }
     @media (prefers-reduced-motion: reduce) {
-      .side-art *, .side-art *::after { animation: none !important; transition: none !important; }
+      .side-art *, .side-art *::after, .side-art::before, .side-art::after { animation: none !important; transition: none !important; }
     }
 
     .m-brand { display: none; }
@@ -609,6 +664,7 @@ export class LoginPage implements OnInit, OnDestroy {
   private readonly router = inject(Router);
 
   protected readonly slides = SLIDES;
+  protected readonly giant = [...'CRONOGRAMA'];
   protected readonly slideMs = SLIDE_MS;
   protected readonly slide = signal(0);
   private timer: ReturnType<typeof setInterval> | undefined;

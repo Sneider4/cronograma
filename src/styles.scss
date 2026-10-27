@@ -141,6 +141,7 @@ a {
 // Segunda mitad de un titular en gris, como en la referencia.
 .tone {
   color: var(--text-3);
+  --glint-base: var(--text-3);
 }
 .small {
   font-size: 12.5px;
@@ -642,6 +643,72 @@ input[type='radio'] {
   .motion .rv > span,
   .motion .fade-up,
   .motion .progress > span { animation: none; }
+}
+
+// ---------- Animaciones en vivo (se repiten mientras la pagina esta abierta) ----------
+// Solo si el sistema no pide menos movimiento.
+@media (prefers-reduced-motion: no-preference) {
+  // Brillo cobre que recorre las palabras de un titulo, una tras otra.
+  // Uso: <span class="tone glint"> con palabras .rv dentro. --glint-base = color de reposo.
+  .glint .rv > span {
+    color: transparent;
+    background:
+      linear-gradient(100deg, transparent 40%, #e8975a 48%, #c2652a 52%, transparent 60%),
+      linear-gradient(var(--glint-base, #8d9097), var(--glint-base, #8d9097));
+    background-size: 300% 100%, 100% 100%;
+    background-position: 150% 0, 0 0;
+    background-repeat: no-repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: glint 6.5s ease-in-out calc(1.8s + var(--i, 0) * 120ms) infinite both;
+  }
+  .motion .glint .rv > span {
+    animation:
+      word-up 0.75s cubic-bezier(0.2, 0.75, 0.2, 1) calc(var(--d, 0ms) + var(--i, 0) * 80ms) both,
+      glint 6.5s ease-in-out calc(1.8s + var(--i, 0) * 120ms) infinite both;
+  }
+
+  // Punto "en vivo": halo que late. El color sale de --halo.
+  .live-dot,
+  .tag.live::before {
+    animation: halo 2.2s ease-out infinite;
+  }
+
+  // Luz que viaja por las barras de avance
+  .progress.flow > span,
+  .flow .progress > span {
+    position: relative;
+    overflow: hidden;
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+      transform: translateX(-100%);
+      animation: flow 2.8s ease-in-out 1.4s infinite;
+    }
+  }
+}
+.live-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--halo, var(--copper));
+}
+.tag.live::before { background: var(--copper); --halo: var(--copper); }
+
+@keyframes glint {
+  0% { background-position: 150% 0, 0 0; }
+  28%, 100% { background-position: -50% 0, 0 0; }
+}
+@keyframes halo {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--halo, var(--copper)) 55%, transparent); }
+  80%, 100% { box-shadow: 0 0 0 7px transparent; }
+}
+@keyframes flow {
+  0% { transform: translateX(-100%); }
+  60%, 100% { transform: translateX(100%); }
 }
 
 // Control segmentado tipo pildora
