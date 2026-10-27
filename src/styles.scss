@@ -1,0 +1,1033 @@
+// ============================================================
+// Tokens
+// Estilo: grises frios + negro + acento cobre degradado, grotesca cerrada,
+// botones pildora y tarjetas muy redondeadas.
+// ============================================================
+:root {
+  --copper: #c2652a;
+  --copper-light: #e0914f;
+  --copper-dark: #7a3612;
+  --copper-grad: linear-gradient(120deg, #e39a5a 0%, #c2652a 45%, #7a3612 100%);
+  --ink: #0b0b0c;
+
+  --bg: #eceef1;
+  --surface: #ffffff;
+  --surface-2: #f5f6f7;
+  --surface-3: #e9eaed;
+  --border: #e3e4e8;
+  --border-strong: #cfd1d6;
+  --text: var(--ink);
+  --text-2: #5d5f66;
+  --text-3: #9c9ea5;
+  --accent: var(--ink);
+  --accent-hover: #2b2c30;
+  --accent-soft: #f3e7dd;
+  --accent-2: var(--copper);
+  --on-accent: #ffffff;
+  --focus: rgba(194, 101, 42, 0.28);
+  --danger: #c23a2c;
+  --danger-soft: #fbecea;
+  --ok: #3f7d55;
+  --warn: #b0661f;
+  --warn-soft: #fbf1e7;
+  --weekend: rgba(11, 11, 12, 0.03);
+  --today: var(--copper);
+  --nav-bg: rgba(236, 238, 241, 0.82);
+  --nav-text: var(--ink);
+  --nav-text-2: #6a6c73;
+  --nav-hover: rgba(11, 11, 12, 0.06);
+  --shadow-sm: 0 1px 2px rgba(11, 11, 12, 0.05);
+  --shadow: 0 6px 20px rgba(11, 11, 12, 0.07);
+  --shadow-lg: 0 24px 60px rgba(11, 11, 12, 0.18);
+  --radius: 20px;
+  --radius-sm: 12px;
+  --pill: 999px;
+  --font: 'Inter Tight', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
+  --display: var(--font);
+  color-scheme: light;
+}
+
+@mixin dark {
+  --bg: #0b0b0c;
+  --surface: #141416;
+  --surface-2: #1a1a1d;
+  --surface-3: #232327;
+  --border: #26262b;
+  --border-strong: #37373d;
+  --text: #f1f1f3;
+  --text-2: #a3a4ab;
+  --text-3: #6c6d74;
+  --accent: #f1f1f3;
+  --accent-hover: #ffffff;
+  --accent-soft: rgba(224, 145, 79, 0.14);
+  --on-accent: #0b0b0c;
+  --focus: rgba(224, 145, 79, 0.35);
+  --danger: #ea6d60;
+  --danger-soft: rgba(234, 109, 96, 0.12);
+  --ok: #6fbf8c;
+  --warn: #e0914f;
+  --warn-soft: rgba(224, 145, 79, 0.12);
+  --weekend: rgba(255, 255, 255, 0.025);
+  --today: var(--copper-light);
+  --nav-bg: rgba(11, 11, 12, 0.8);
+  --nav-text: #f1f1f3;
+  --nav-text-2: #9b9ca3;
+  --nav-hover: rgba(255, 255, 255, 0.07);
+  --shadow-sm: none;
+  --shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.6);
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    @include dark;
+  }
+}
+:root[data-theme='dark'] {
+  @include dark;
+}
+
+// ============================================================
+// Base
+// ============================================================
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: -0.005em;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  line-height: 1.15;
+  font-weight: 500;
+  letter-spacing: -0.035em;
+}
+h1,
+h2 {
+  letter-spacing: -0.045em;
+}
+
+a {
+  color: var(--text);
+}
+
+.muted {
+  color: var(--text-2);
+}
+.faint {
+  color: var(--text-3);
+}
+// Segunda mitad de un titular en gris, como en la referencia.
+.tone {
+  color: var(--text-3);
+}
+.small {
+  font-size: 12.5px;
+}
+.mono {
+  font-family: var(--mono);
+}
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+// Texto de cobre degradado
+.copper-text {
+  background: var(--copper-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+// Etiqueta pequena (sin mayusculas, como "Creative Agency" en la referencia)
+.eyebrow {
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  color: var(--text-2);
+}
+
+// Etiqueta con punto: "• Portafolio"
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 8px;
+  background: var(--surface-3);
+  color: var(--text);
+  font-size: 12.5px;
+  font-weight: 500;
+  &::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+}
+
+// ============================================================
+// Barra de navegacion (components/topbar.ts)
+// ============================================================
+.appnav {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  height: 60px;
+  padding: 0 24px;
+  background: var(--nav-bg);
+  backdrop-filter: saturate(1.4) blur(14px);
+  border-bottom: 1px solid var(--border);
+  color: var(--nav-text);
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--nav-text);
+    font-size: 19px;
+    font-weight: 500;
+    letter-spacing: -0.045em;
+    text-decoration: none;
+    .mark {
+      width: 22px;
+      height: 22px;
+      color: var(--text);
+    }
+  }
+
+  .crumbs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    flex: 1;
+    font-size: 13.5px;
+    color: var(--nav-text-2);
+
+    a {
+      color: var(--nav-text-2);
+      text-decoration: none;
+      &:hover {
+        color: var(--nav-text);
+      }
+    }
+    .current {
+      color: var(--nav-text);
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .when {
+    display: flex;
+    flex-direction: column;
+    padding-left: 10px;
+    border-left: 1px solid var(--border-strong);
+    line-height: 1.2;
+    small {
+      font-size: 10px;
+      color: var(--nav-text-2);
+    }
+    span {
+      font-size: 12px;
+      font-weight: 500;
+    }
+  }
+
+  .me {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+    .name {
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 13px;
+      color: var(--nav-text-2);
+    }
+  }
+  .avatar {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--copper-grad);
+    color: #fff;
+    font-size: 11.5px;
+    font-weight: 600;
+  }
+  .nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 34px;
+    padding: 0 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--pill);
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    &:hover {
+      border-color: var(--text);
+    }
+  }
+
+  @media (max-width: 760px) {
+    .when,
+    .me .name,
+    .nav-btn span {
+      display: none;
+    }
+    .nav-btn {
+      width: 34px;
+      padding: 0;
+      justify-content: center;
+    }
+  }
+  @media (max-width: 480px) {
+    .brand span {
+      display: none;
+    }
+  }
+}
+
+// ============================================================
+// Botones (pildora)
+// ============================================================
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 38px;
+  padding: 0 16px;
+  border-radius: var(--pill);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s,
+    transform 0.15s;
+
+  &:hover:not(:disabled) {
+    border-color: var(--text);
+  }
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--focus);
+  }
+
+  // Negro, con circulo y flecha opcional al final (.btn-go)
+  &.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--on-accent);
+    &:hover:not(:disabled) {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
+    &:has(.btn-go) {
+      padding-right: 4px;
+    }
+  }
+  &.copper {
+    background: var(--copper-grad);
+    border-color: transparent;
+    color: #fff;
+    &:hover:not(:disabled) {
+      filter: brightness(1.06);
+      border-color: transparent;
+    }
+  }
+  &.soft {
+    background: var(--surface-3);
+    border-color: transparent;
+    &:hover:not(:disabled) {
+      background: var(--border-strong);
+      border-color: transparent;
+    }
+  }
+  &.danger {
+    color: var(--danger);
+    &:hover:not(:disabled) {
+      background: var(--danger-soft);
+      border-color: var(--danger);
+    }
+  }
+  &.ghost {
+    border-color: transparent;
+    background: transparent;
+    color: var(--text-2);
+    &:hover:not(:disabled) {
+      background: var(--surface-3);
+      color: var(--text);
+    }
+  }
+  &.sm {
+    height: 30px;
+    padding: 0 12px;
+    font-size: 12.5px;
+  }
+  &.icon {
+    width: 38px;
+    padding: 0;
+  }
+  &.sm.icon {
+    width: 30px;
+  }
+
+  .btn-go {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    margin-left: 6px;
+    border-radius: 50%;
+    background: var(--on-accent);
+    color: var(--accent);
+    transition: transform 0.2s;
+  }
+  &:hover .btn-go {
+    transform: rotate(-45deg);
+  }
+}
+
+// ============================================================
+// Formularios
+// ============================================================
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+
+  > label,
+  > .label {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text-2);
+  }
+  .hint {
+    font-size: 12px;
+    color: var(--text-3);
+  }
+  .error {
+    font-size: 12px;
+    color: var(--danger);
+  }
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+  font-size: 13.5px;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s,
+    background 0.15s;
+
+  &:hover {
+    border-color: var(--border-strong);
+  }
+  &:focus {
+    outline: none;
+    border-color: var(--copper);
+    background: var(--surface);
+    box-shadow: 0 0 0 3px var(--focus);
+  }
+  &.invalid {
+    border-color: var(--danger);
+  }
+  &:disabled {
+    color: var(--text-2);
+  }
+}
+.textarea {
+  height: auto;
+  min-height: 84px;
+  padding: 10px 14px;
+  resize: vertical;
+}
+.select.sm,
+.input.sm {
+  height: 34px;
+  font-size: 13px;
+}
+.select {
+  padding-right: 10px;
+}
+
+// Campo con icono a la izquierda (buscador)
+.input-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  app-icon {
+    position: absolute;
+    left: 12px;
+    color: var(--text-3);
+    pointer-events: none;
+  }
+  .input {
+    padding-left: 34px;
+    border-radius: var(--pill);
+  }
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+@media (max-width: 560px) {
+  .grid-2,
+  .grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+input[type='range'] {
+  accent-color: var(--copper);
+  width: 100%;
+}
+input[type='color'] {
+  width: 40px;
+  height: 40px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  cursor: pointer;
+}
+input[type='checkbox'],
+input[type='radio'] {
+  accent-color: var(--copper);
+}
+
+// ============================================================
+// Superficies
+// ============================================================
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 7px;
+  font-size: 11.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  background: var(--surface-3);
+  color: var(--text-2);
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+}
+
+.progress {
+  height: 5px;
+  border-radius: var(--pill);
+  background: var(--surface-3);
+  overflow: hidden;
+  > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--copper-grad);
+  }
+}
+
+// Control segmentado tipo pildora
+.seg {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: var(--pill);
+  background: var(--surface-3);
+  button {
+    height: 28px;
+    padding: 0 13px;
+    border: 0;
+    border-radius: var(--pill);
+    background: transparent;
+    color: var(--text-2);
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      background 0.15s,
+      color 0.15s;
+    &:hover:not(.on) {
+      color: var(--text);
+    }
+    &.on {
+      background: var(--accent);
+      color: var(--on-accent);
+    }
+  }
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 64px 20px;
+  text-align: center;
+  color: var(--text-2);
+
+  .empty-icon {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    margin-bottom: 6px;
+    border-radius: 18px;
+    background: var(--ink);
+    color: #fff;
+  }
+  h3 {
+    font-size: 24px;
+    color: var(--text);
+  }
+  p {
+    margin: 0;
+    max-width: 460px;
+  }
+}
+
+// ============================================================
+// Dialogos
+// ============================================================
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 7vh 16px 16px;
+  background: rgba(11, 11, 12, 0.45);
+  backdrop-filter: blur(6px);
+  overflow-y: auto;
+  animation: fade 0.15s ease-out;
+}
+
+.dialog {
+  width: 100%;
+  max-width: 640px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 26px;
+  box-shadow: var(--shadow-lg);
+  animation: rise 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  &.wide {
+    max-width: 900px;
+  }
+
+  > header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 20px 24px 14px;
+    h3 {
+      font-size: 22px;
+    }
+  }
+  > .body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 8px 24px 22px;
+  }
+  > footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+
+    .spacer {
+      flex: 1;
+    }
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.99);
+  }
+}
+
+.callout {
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  font-size: 13px;
+
+  &.error {
+    background: var(--danger-soft);
+    color: var(--danger);
+  }
+  &.warn {
+    background: var(--warn-soft);
+  }
+}
+
+// Menu desplegable simple
+.menu {
+  position: absolute;
+  z-index: 50;
+  min-width: 270px;
+  padding: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow-lg);
+
+  button {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+    padding: 10px 12px;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    font-size: 13.5px;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--surface-2);
+    }
+    app-icon {
+      margin-top: 2px;
+      color: var(--copper);
+    }
+    span {
+      display: flex;
+      flex-direction: column;
+    }
+    small {
+      color: var(--text-3);
+      font-size: 12px;
+      font-weight: 400;
+    }
+  }
+  hr {
+    margin: 4px 8px;
+    border: 0;
+    border-top: 1px solid var(--border);
+  }
+}
+
+// ============================================================
+// FullCalendar con los tokens de la app
+// ============================================================
+.fc {
+  --fc-border-color: var(--border);
+  --fc-page-bg-color: var(--surface);
+  --fc-neutral-bg-color: var(--surface-2);
+  --fc-today-bg-color: var(--accent-soft);
+  --fc-button-bg-color: var(--surface);
+  --fc-button-border-color: var(--border-strong);
+  --fc-button-text-color: var(--text);
+  --fc-button-hover-bg-color: var(--surface-2);
+  --fc-button-hover-border-color: var(--text);
+  --fc-button-active-bg-color: var(--accent);
+  --fc-button-active-border-color: var(--accent);
+  --fc-list-event-hover-bg-color: var(--surface-2);
+  font-size: 13px;
+
+  .fc-button {
+    height: 34px;
+    padding: 0 14px;
+    border-radius: var(--pill) !important;
+    font-weight: 500;
+    font-size: 12.5px;
+    text-transform: capitalize;
+    box-shadow: none !important;
+  }
+  .fc-button-group {
+    gap: 4px;
+  }
+  .fc-button-active {
+    color: var(--on-accent) !important;
+  }
+  // "octubre de 2026" -> "Octubre de 2026" (capitalize pondria "De")
+  .fc-toolbar-title {
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    &::first-letter {
+      text-transform: uppercase;
+    }
+  }
+  .fc-scrollgrid {
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .fc-col-header-cell {
+    background: var(--surface-2);
+  }
+  .fc-col-header-cell-cushion {
+    padding: 8px 4px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-2);
+    text-transform: capitalize;
+    text-decoration: none;
+  }
+  .fc-daygrid-day-number {
+    font-size: 12.5px;
+    color: var(--text-2);
+    text-decoration: none;
+  }
+  .fc-day-today .fc-daygrid-day-number {
+    color: var(--copper);
+    font-weight: 600;
+  }
+  .fc-event {
+    cursor: pointer;
+    border: 0;
+    border-radius: var(--pill);
+    padding: 1px 8px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .fc-event.is-done {
+    opacity: 0.5;
+    text-decoration: line-through;
+  }
+  .fc-list-day-cushion {
+    background: var(--surface-2);
+  }
+}
+
+// ============================================================
+// Movil: dialogos como hoja inferior, controles comodos al tacto
+// ============================================================
+@media (max-width: 640px) {
+  body {
+    font-size: 14.5px;
+  }
+  // Evita el zoom automatico de iOS al enfocar campos (necesita >= 16px).
+  .input,
+  .select,
+  .textarea,
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  .backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .dialog {
+    display: flex;
+    flex-direction: column;
+    max-width: none !important;
+    max-height: 94dvh;
+    border-radius: 26px 26px 0 0;
+    border-bottom: 0;
+    animation: sheet 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+    // Asa de la hoja
+    &::before {
+      content: '';
+      flex: none;
+      align-self: center;
+      width: 40px;
+      height: 4px;
+      margin-top: 8px;
+      border-radius: 999px;
+      background: var(--border-strong);
+    }
+    > header {
+      flex: none;
+      padding: 10px 18px 10px;
+      h3 {
+        font-size: 20px;
+      }
+    }
+    > .body {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: 6px 18px 18px;
+    }
+    > footer {
+      flex: none;
+      flex-wrap: wrap;
+      padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
+      border-radius: 0;
+      .btn {
+        flex: 1;
+        height: 44px;
+      }
+      .spacer {
+        display: none;
+      }
+    }
+  }
+
+  .btn {
+    min-height: 38px;
+  }
+
+  // Menus anclados: en movil se abren a lo ancho para no salirse de la pantalla.
+  .menu {
+    position: fixed !important;
+    left: 12px !important;
+    right: 12px !important;
+    top: auto !important;
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    min-width: 0;
+    z-index: 120;
+    animation: sheet 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+    button {
+      padding: 14px 12px;
+    }
+  }
+
+  .toasts {
+    left: 12px;
+    right: 12px;
+  }
+
+  // FullCalendar: barra en dos filas (titulo arriba, controles abajo)
+  .fc .fc-header-toolbar {
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px !important;
+  }
+  .fc .fc-toolbar-chunk:nth-child(2) {
+    order: -1;
+    flex: 1 1 100%;
+  }
+  .fc .fc-toolbar-title {
+    font-size: 22px;
+  }
+  .fc .fc-button {
+    height: 36px;
+    padding: 0 12px;
+  }
+  .fc .fc-daygrid-event {
+    font-size: 10.5px;
+    padding: 0 4px;
+  }
+  .fc .fc-col-header-cell-cushion {
+    font-size: 11px;
+  }
+  .fc .fc-list-event-time {
+    display: none;
+  }
+}
+
+@keyframes sheet {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+}
+
+// Arrastre del Kanban (la vista previa se monta en <body>, fuera del componente)
+.cdk-drag-preview {
+  box-shadow: var(--shadow-lg) !important;
+  border-radius: 16px;
+  cursor: grabbing;
+}
+.cdk-drag-placeholder {
+  opacity: 0.35;
+}
+.cdk-drag-animating,
+.cdk-drop-list-dragging .cdk-drag:not(.cdk-drag-placeholder) {
+  transition: transform 0.2s ease;
+}

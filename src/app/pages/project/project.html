@@ -1,0 +1,257 @@
+<app-topbar>
+  <a routerLink="/">Inicio</a>
+  @if (board.project(); as p) {
+    <app-icon name="chevron-right" [size]="14" />
+    <span class="current">{{ p.name }}</span>
+  }
+</app-topbar>
+
+@if (board.loading()) {
+  <div class="center muted">Cargando proyecto…</div>
+} @else if (board.notFound()) {
+  <div class="center">
+    <div class="card empty">
+      <span class="empty-icon"><app-icon name="folder" [size]="22" /></span>
+      <h3>Proyecto no encontrado</h3>
+      <p>No existe o no eres miembro. Pide el código de invitación a su dueño.</p>
+      <a class="btn" routerLink="/">Volver a mis proyectos</a>
+    </div>
+  </div>
+} @else if (board.project(); as p) {
+  <header class="phead">
+    <div class="inner">
+      <div class="title-row">
+        <div class="title">
+          <span class="tag" [style.color]="p.color">Proyecto · {{ board.members().length }} {{ board.members().length === 1 ? 'miembro' : 'miembros' }}</span>
+          <h1>{{ p.name }}</h1>
+          @if (p.description) {
+            <p class="desc">{{ p.description }}</p>
+          }
+        </div>
+        <div class="top-actions">
+          <button class="avatars hide-sm" (click)="settingsTab.set('equipo')" title="Ver equipo">
+            @for (m of board.members().slice(0, 4); track m.user_id) {
+              <span class="av" [title]="m.profile?.full_name ?? ''">{{ (m.profile?.full_name || '?')[0].toUpperCase() }}</span>
+            }
+            @if (board.members().length > 4) {
+              <span class="av more">+{{ board.members().length - 4 }}</span>
+            }
+          </button>
+          <button class="btn" (click)="settingsTab.set('equipo')">
+            <app-icon name="users" /> <span class="hide-sm">Invitar</span>
+          </button>
+          <button class="btn icon" (click)="settingsTab.set('general')" title="Ajustes del proyecto" aria-label="Ajustes del proyecto">
+            <app-icon name="settings" />
+          </button>
+        </div>
+      </div>
+
+      <div class="tab-row">
+        <nav class="tabs" role="tablist">
+          @for (v of views; track v.value) {
+            <button role="tab" [class.on]="view() === v.value" [attr.aria-selected]="view() === v.value" (click)="setView(v.value)">
+              <app-icon [name]="v.icon" [size]="15" />{{ v.label }}
+            </button>
+          }
+        </nav>
+
+        <div class="actions">
+          <div class="menu-anchor">
+            <button class="btn" (click)="toggleExcel($event)" [disabled]="excelBusy()">
+              <app-icon name="sheet" />
+              {{ excelBusy() ? 'Procesando…' : 'Excel' }}
+              <app-icon name="chevron-down" [size]="14" />
+            </button>
+            @if (excelMenu()) {
+              <div class="menu right" (click)="$event.stopPropagation()">
+                <button (click)="exportExcel()">
+                  <app-icon name="download" />
+                  <span>Exportar a Excel<small>Actividades y cronograma por semanas</small></span>
+                </button>
+                <hr />
+                <button (click)="downloadTemplate()">
+                  <app-icon name="sheet" />
+                  <span>Descargar plantilla<small>Formato para cargar muchas actividades</small></span>
+                </button>
+                <button (click)="pickFile()">
+                  <app-icon name="upload" />
+                  <span>Importar Excel…<small>Sube la plantilla diligenciada (.xlsx)</small></span>
+                </button>
+              </div>
+            }
+            <input #file type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden (change)="onFile($event)" />
+          </div>
+          <button class="btn primary" (click)="board.newTask()">
+            Nueva actividad <span class="btn-go"><app-icon name="plus" [size]="15" /></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    @if (showSummary() && board.tasks().length) {
+      <section class="overview">
+        <!-- Indicadores -->
+        <div class="stats">
+          <div class="stat">
+            <span class="eyebrow">Actividades</span>
+            <b class="num">{{ board.kpis().total }}</b>
+          </div>
+          <div class="stat">
+            <span class="eyebrow">Completadas</span>
+            <b class="num">{{ board.kpis().done }}</b>
+          </div>
+          <div class="stat">
+            <span class="eyebrow">En proceso</span>
+            <b class="num">{{ board.kpis().inProgress }}</b>
+          </div>
+          <button class="stat link" (click)="filter('status', 'bloqueada')" title="Ver bloqueadas">
+            <span class="eyebrow">Bloqueadas</span>
+            <b class="num" [class.bad]="board.kpis().blocked">{{ board.kpis().blocked }}</b>
+          </button>
+          <button class="stat link" (click)="filter('status', 'vencidas')" title="Ver vencidas">
+            <span class="eyebrow">Vencidas</span>
+            <b class="num" [class.bad]="board.kpis().overdue">{{ board.kpis().overdue }}</b>
+          </button>
+          <div class="stat dark">
+            <span class="eyebrow">Avance</span>
+            <b class="num copper-text">{{ board.kpis().progress }}%</b>
+            <div class="progress"><span [style.width.%]="board.kpis().progress"></span></div>
+          </div>
+        </div>
+
+        <!-- Avance por objetivo -->
+        <div class="card panel">
+          <header class="panel-head">
+            <h2>Objetivos</h2>
+            <button class="btn sm ghost" (click)="settingsTab.set('objetivos')">Editar</button>
+          </header>
+          @if (!objectiveProgress().length) {
+            <p class="small muted calm">
+              Aún no hay objetivos. <button class="textlink" (click)="settingsTab.set('objetivos')">Defínelos</button> para agrupar y colorear las actividades.
+            </p>
+          }
+          <div class="obj-list">
+            @for (o of objectiveProgress(); track o.key) {
+              <button class="obj" [class.on]="board.filters().objective === o.key" (click)="toggleObjective(o.key)"
+                      [title]="board.filters().objective === o.key ? 'Quitar filtro' : 'Filtrar por ' + o.code">
+                <span class="code" [style.--c]="o.color">{{ o.code }}</span>
+                <span class="oname">{{ o.name || '—' }}</span>
+                <span class="bar"><i [style.width.%]="o.pct" [style.background]="o.color"></i></span>
+                <span class="num small onum">{{ o.done }}/{{ o.total }}</span>
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Proximas entregas -->
+        <div class="card panel">
+          <header class="panel-head">
+            <h2>Próximas entregas</h2>
+            <span class="faint small">{{ upcoming().length ? 'Sin completar' : '' }}</span>
+          </header>
+          @if (!upcoming().length) {
+            <p class="small muted calm">Todas las actividades están completadas.</p>
+          }
+          <div class="up-list">
+            @for (t of upcoming(); track t.id) {
+              <button class="up" (click)="board.edit(t)">
+                <span class="dot" [style.background]="board.colorOf(t)"></span>
+                <span class="utext">
+                  <span class="uname">{{ t.name }}</span>
+                  <span class="umeta">{{ board.objectiveOf(t)?.code ?? 'Sin objetivo' }}{{ t.assignee ? ' · ' + t.assignee : '' }}</span>
+                </span>
+                <span class="when" [class.bad]="t.end_date < today">{{ rel(t.end_date) }}</span>
+              </button>
+            }
+          </div>
+        </div>
+      </section>
+    }
+
+    <section class="filters">
+      <label class="input-icon search">
+        <app-icon name="search" [size]="15" />
+        <input class="input sm" type="search" placeholder="Buscar actividad, entregable o responsable"
+               [value]="board.filters().search" (input)="filter('search', $any($event.target).value)" />
+      </label>
+      <!-- En movil los filtros se pliegan detras de este boton -->
+      <button class="btn sm only-sm" [class.primary]="filtersOpen()" (click)="filtersOpen.set(!filtersOpen())">
+        <app-icon name="settings" [size]="14" /> Filtros{{ activeFilters() ? ' · ' + activeFilters() : '' }}
+      </button>
+      <div class="adv" [class.open]="filtersOpen()">
+      <select class="select sm" [value]="board.filters().objective" (change)="filter('objective', $any($event.target).value)">
+        <option value="all">Todos los objetivos</option>
+        @for (o of board.objectives(); track o.id) {
+          <option [value]="o.id" [selected]="o.id === board.filters().objective">{{ o.code }}{{ o.name ? ' · ' + o.name : '' }}</option>
+        }
+        <option value="none" [selected]="board.filters().objective === 'none'">Sin objetivo</option>
+      </select>
+      <select class="select sm" [value]="board.filters().status" (change)="filter('status', $any($event.target).value)">
+        <option value="all">Todos los estados</option>
+        @for (s of statuses; track s.value) {
+          
+
+        }
+        <option value="vencidas">Vencidas</option>
+      </select>
+      <select class="select sm" [value]="board.filters().assignee" (change)="filter('assignee', $any($event.target).value)">
+        <option value="all">Todos los responsables</option>
+        @for (a of board.assignees(); track a) {
+          <option [value]="a" [selected]="a === board.filters().assignee">{{ a }}</option>
+        }
+      </select>
+      @if (board.hasFilters()) {
+        <button class="btn sm ghost" (click)="board.resetFilters()"><app-icon name="x" [size]="14" /> Limpiar filtros</button>
+      }
+      </div>
+      <span class="spacer"></span>
+      @if (board.tasks().length) {
+        <span class="faint small num shown">
+          {{ board.filteredTasks().length === board.tasks().length ? board.tasks().length + ' actividades' : board.filteredTasks().length + ' de ' + board.tasks().length + ' actividades' }}
+        </span>
+        <button class="btn sm" (click)="toggleSummary()">{{ showSummary() ? 'Ocultar resumen' : 'Ver resumen' }}</button>
+      }
+    </section>
+
+    <!-- Vista -->
+    @if (!board.tasks().length && view() !== 'calendario') {
+      <div class="card empty">
+        <span class="empty-icon"><app-icon name="gantt" [size]="22" /></span>
+        <h3>Este cronograma está vacío</h3>
+        <p>
+          Crea actividades una por una o, si son muchas, descarga la plantilla de Excel, diligénciala y súbela.
+          @if (!board.objectives().length) {
+            <br /><span class="small faint">Define primero los objetivos (OE1, OE2…) en Ajustes para agrupar y colorear las actividades.</span>
+          }
+        </p>
+        <div class="empty-actions">
+          <button class="btn primary" (click)="board.newTask()"><app-icon name="plus" /> Nueva actividad</button>
+          <button class="btn" (click)="downloadTemplate()"><app-icon name="download" /> Descargar plantilla</button>
+          <button class="btn" (click)="pickFile()"><app-icon name="upload" /> Importar Excel</button>
+          @if (!board.objectives().length) {
+            <button class="btn ghost" (click)="settingsTab.set('objetivos')">Definir objetivos</button>
+          }
+        </div>
+      </div>
+    } @else {
+      @switch (view()) {
+        @case ('gantt') { <app-gantt /> }
+        @case ('calendario') { <app-calendar /> }
+        @case ('kanban') { <app-kanban /> }
+        @case ('lista') { <app-task-list /> }
+      }
+    }
+  </main>
+
+  @if (board.editing()) {
+    <app-task-dialog />
+  }
+  @if (importResult(); as r) {
+    <app-import-dialog [result]="r" [fileName]="importFile()" (closed)="importResult.set(null)" />
+  }
+  @if (settingsTab(); as tab) {
+    <app-settings-dialog [initialTab]="tab" (closed)="settingsTab.set(null)" />
+  }
+}
