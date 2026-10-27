@@ -8,29 +8,38 @@ import { Topbar } from '../../components/topbar';
 import { AuthService } from '../../core/auth.service';
 import { diffDays, formatDate, todayISO } from '../../core/dates';
 import { PALETTE, STATUSES } from '../../core/models';
-import { CountUp, firstVisit } from '../../core/motion';
 import { loadPref, savePref } from '../../core/prefs';
 import { AgendaItem, ProjectsService } from '../../core/projects.service';
 import { friendlyError } from '../../core/supabase';
 import { ToastService } from '../../core/toast.service';
+
+function firstVisit(): boolean {
+  try {
+    if (sessionStorage.getItem('intro.home')) return false;
+    sessionStorage.setItem('intro.home', '1');
+  } catch {
+    // Sin almacenamiento: se anima siempre.
+  }
+  return true;
+}
 
 type Layout = 'grid' | 'list';
 type Sort = 'recent' | 'name' | 'progress' | 'due';
 
 @Component({
   selector: 'app-projects',
-  imports: [FormsModule, RouterLink, NgTemplateOutlet, Topbar, Icon, CountUp],
+  imports: [FormsModule, RouterLink, NgTemplateOutlet, Topbar, Icon],
   template: `
     <app-topbar><span class="current">Inicio</span></app-topbar>
 
-    <main class="page flow" [class.motion]="intro">
+    <main class="page">
       <!-- Saludo -->
       <section class="hero">
         <div class="intro">
-          <span class="tag live">Espacio de trabajo · en vivo</span>
-          <h1>
+          <span class="tag">Espacio de trabajo</span>
+          <h1 [class.motion]="intro">
             <span class="rv"><span style="--i: 0">{{ greeting() }},</span></span><span class="rv"><span style="--i: 1">{{ firstName() }}.</span></span>
-            <span class="tone glint"><span class="rv"><span style="--i: 3">Esto</span></span><span class="rv"><span style="--i: 4">es</span></span><span class="rv"><span style="--i: 5">lo</span></span><span class="rv"><span style="--i: 6">que</span></span><span class="rv"><span style="--i: 7">viene.</span></span></span>
+            <span class="tone"><span class="rv"><span style="--i: 3">Esto</span></span><span class="rv"><span style="--i: 4">es</span></span><span class="rv"><span style="--i: 5">lo</span></span><span class="rv"><span style="--i: 6">que</span></span><span class="rv"><span style="--i: 7">viene.</span></span></span>
           </h1>
         </div>
         <div class="actions">
@@ -56,13 +65,13 @@ type Sort = 'recent' | 'name' | 'progress' | 'due';
 
         <!-- Indicadores de todos los proyectos -->
         <section class="kpis">
-          <div class="kpi"><span class="eyebrow">Proyectos</span><b class="num"><span [countUp]="t.projects" [countUpAnimate]="intro"></span></b></div>
-          <div class="kpi"><span class="eyebrow">Actividades</span><b class="num"><span [countUp]="t.total" [countUpAnimate]="intro"></span></b><small>{{ t.done }} completadas</small></div>
-          <div class="kpi"><span class="eyebrow">En proceso</span><b class="num"><span [countUp]="t.inProgress" [countUpAnimate]="intro"></span></b><small>{{ t.pending }} pendientes</small></div>
-          <div class="kpi"><span class="eyebrow">Vencidas</span><b class="num" [class.bad]="t.overdue"><span [countUp]="t.overdue" [countUpAnimate]="intro"></span></b><small>{{ t.blocked }} bloqueadas</small></div>
-          <div class="kpi dark glow-card">
+          <div class="kpi"><span class="eyebrow">Proyectos</span><b class="num">{{ t.projects }}</b></div>
+          <div class="kpi"><span class="eyebrow">Actividades</span><b class="num">{{ t.total }}</b><small>{{ t.done }} completadas</small></div>
+          <div class="kpi"><span class="eyebrow">En proceso</span><b class="num">{{ t.inProgress }}</b><small>{{ t.pending }} pendientes</small></div>
+          <div class="kpi"><span class="eyebrow">Vencidas</span><b class="num" [class.bad]="t.overdue">{{ t.overdue }}</b><small>{{ t.blocked }} bloqueadas</small></div>
+          <div class="kpi dark">
             <span class="eyebrow">Avance global</span>
-            <b class="num brand-text"><span [countUp]="t.progress" [countUpAnimate]="intro"></span>%</b>
+            <b class="num copper-text">{{ t.progress }}%</b>
             <div class="progress"><span [style.width.%]="t.progress"></span></div>
           </div>
         </section>
@@ -239,7 +248,7 @@ type Sort = 'recent' | 'name' | 'progress' | 'due';
 
     <ng-template #row let-i>
       <a class="arow" [routerLink]="['/p', i.project.id]">
-        <span class="dot" [class.live-dot]="isLate(i)" [style.background]="i.project.color"></span>
+        <span class="dot" [style.background]="i.project.color"></span>
         <span class="atext">
           <span class="aname">{{ i.task.name }}</span>
           <span class="aproj">{{ i.project.name }}{{ i.task.assignee ? ' · ' + i.task.assignee : '' }}</span>
@@ -336,8 +345,6 @@ type Sort = 'recent' | 'name' | 'progress' | 'due';
         .progress { height: 6px; background: rgba(255, 255, 255, 0.15); }
       }
     }
-    /* Agenda: el punto de las vencidas late en rojo */
-    .arow .live-dot { --halo: var(--danger); }
 
     /* ---------- Cuerpo en dos columnas ---------- */
     .main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 400px); gap: 20px; align-items: start; }
@@ -390,7 +397,7 @@ type Sort = 'recent' | 'name' | 'progress' | 'due';
     .nx { display: flex; align-items: center; gap: 8px; font-weight: 500; }
     .ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
     .when {
-      flex: none; padding: 1px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--brand);
+      flex: none; padding: 1px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--copper);
       font-size: 11.5px; font-weight: 600; white-space: nowrap;
       &.bad { background: var(--danger-soft); color: var(--danger); }
     }
@@ -403,7 +410,7 @@ type Sort = 'recent' | 'name' | 'progress' | 'due';
       background: transparent; border: 1.5px dashed var(--border-strong);
       .plus { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: var(--surface-3); }
       b { font-size: 17px; font-weight: 500; letter-spacing: -0.03em; }
-      &:hover { border-color: var(--text); .plus { background: var(--brand-grad); color: #fff; } }
+      &:hover { border-color: var(--text); .plus { background: var(--copper-grad); color: #fff; } }
     }
 
     /* Lista */
@@ -546,8 +553,8 @@ export class ProjectsPage implements OnInit {
   private readonly auth = inject(AuthService);
   protected readonly Math = Math;
   private readonly router = inject(Router);
-  /** Animacion de entrada solo la primera vez por sesion. */
-  protected readonly intro = firstVisit('home');
+  /** El saludo entra por palabras solo la primera vez por sesion. */
+  protected readonly intro = firstVisit();
   private readonly toast = inject(ToastService);
 
   protected readonly palette = PALETTE;

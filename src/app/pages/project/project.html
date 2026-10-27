@@ -18,12 +18,12 @@
     </div>
   </div>
 } @else if (board.project(); as p) {
-  <header class="phead" [class.motion]="intro()">
+  <header class="phead">
     <div class="inner">
       <div class="title-row">
         <div class="title">
-          <span class="tag live" [style.color]="p.color">Proyecto · {{ board.members().length }} {{ board.members().length === 1 ? 'miembro' : 'miembros' }}</span>
-          <h1 class="fade-up">{{ p.name }}</h1>
+          <span class="tag" [style.color]="p.color">Proyecto · {{ board.members().length }} {{ board.members().length === 1 ? 'miembro' : 'miembros' }}</span>
+          <h1>{{ p.name }}</h1>
           @if (p.description) {
             <p class="desc">{{ p.description }}</p>
           }
@@ -89,34 +89,34 @@
     </div>
   </header>
 
-  <main class="page" [class.motion]="intro()">
+  <main class="page">
     @if (showSummary() && board.tasks().length) {
-      <section class="overview flow calm">
+      <section class="overview">
         <!-- Indicadores -->
         <div class="stats">
           <div class="stat">
             <span class="eyebrow">Actividades</span>
-            <b class="num"><span [countUp]="board.kpis().total" [countUpAnimate]="intro()"></span></b>
+            <b class="num">{{ board.kpis().total }}</b>
           </div>
           <div class="stat">
             <span class="eyebrow">Completadas</span>
-            <b class="num"><span [countUp]="board.kpis().done" [countUpAnimate]="intro()"></span></b>
+            <b class="num">{{ board.kpis().done }}</b>
           </div>
           <div class="stat">
             <span class="eyebrow">En proceso</span>
-            <b class="num"><span [countUp]="board.kpis().inProgress" [countUpAnimate]="intro()"></span></b>
+            <b class="num">{{ board.kpis().inProgress }}</b>
           </div>
           <button class="stat link" (click)="filter('status', 'bloqueada')" title="Ver bloqueadas">
             <span class="eyebrow">Bloqueadas</span>
-            <b class="num" [class.bad]="board.kpis().blocked"><span [countUp]="board.kpis().blocked" [countUpAnimate]="intro()"></span></b>
+            <b class="num" [class.bad]="board.kpis().blocked">{{ board.kpis().blocked }}</b>
           </button>
           <button class="stat link" (click)="filter('status', 'vencidas')" title="Ver vencidas">
             <span class="eyebrow">Vencidas</span>
-            <b class="num" [class.bad]="board.kpis().overdue"><span [countUp]="board.kpis().overdue" [countUpAnimate]="intro()"></span></b>
+            <b class="num" [class.bad]="board.kpis().overdue">{{ board.kpis().overdue }}</b>
           </button>
-          <div class="stat dark glow-card">
+          <div class="stat dark">
             <span class="eyebrow">Avance</span>
-            <b class="num brand-text"><span [countUp]="board.kpis().progress" [countUpAnimate]="intro()"></span>%</b>
+            <b class="num copper-text">{{ board.kpis().progress }}%</b>
             <div class="progress"><span [style.width.%]="board.kpis().progress"></span></div>
           </div>
         </div>
@@ -157,7 +157,7 @@
           <div class="up-list">
             @for (t of upcoming(); track t.id) {
               <button class="up" (click)="board.edit(t)">
-                <span class="dot" [class.live-dot]="t.end_date < today" [style.background]="board.colorOf(t)"></span>
+                <span class="dot" [style.background]="board.colorOf(t)"></span>
                 <span class="utext">
                   <span class="uname">{{ t.name }}</span>
                   <span class="umeta">{{ board.objectiveOf(t)?.code ?? 'Sin objetivo' }}{{ t.assignee ? ' · ' + t.assignee : '' }}</span>

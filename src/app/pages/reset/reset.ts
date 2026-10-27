@@ -114,7 +114,7 @@ type State = 'checking' | 'form' | 'invalid';
     input {
       width: 100%; height: 50px; padding: 0 18px; border: 1px solid transparent; border-radius: 16px;
       background: var(--surface-3); color: var(--text); font: inherit; font-size: 16px;
-      &:focus { outline: none; background: var(--surface); border-color: var(--brand); box-shadow: 0 0 0 4px var(--focus); }
+      &:focus { outline: none; background: var(--surface); border-color: var(--copper); box-shadow: 0 0 0 4px var(--focus); }
     }
     .pass { position: relative; input { padding-right: 52px; } }
     .eye {
