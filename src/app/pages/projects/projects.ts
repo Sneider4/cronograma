@@ -12,16 +12,7 @@ import { loadPref, savePref } from '../../core/prefs';
 import { AgendaItem, ProjectsService } from '../../core/projects.service';
 import { friendlyError } from '../../core/supabase';
 import { ToastService } from '../../core/toast.service';
-
-function firstVisit(): boolean {
-  try {
-    if (sessionStorage.getItem('intro.home')) return false;
-    sessionStorage.setItem('intro.home', '1');
-  } catch {
-    // Sin almacenamiento: se anima siempre.
-  }
-  return true;
-}
+import { firstVisit } from '../../core/motion';
 
 type Layout = 'grid' | 'list';
 type Sort = 'recent' | 'name' | 'progress' | 'due';
@@ -32,14 +23,14 @@ type Sort = 'recent' | 'name' | 'progress' | 'due';
   template: `
     <app-topbar><span class="current">Inicio</span></app-topbar>
 
-    <main class="page">
+    <main class="page" [class.motion]="intro">
       <!-- Saludo -->
       <section class="hero">
         <div class="intro">
           <span class="tag">Espacio de trabajo</span>
-          <h1 [class.motion]="intro">
+          <h1>
             <span class="rv"><span style="--i: 0">{{ greeting() }},</span></span>&ngsp;<span class="rv"><span style="--i: 1">{{ firstName() }}.</span></span>&ngsp;
-            <span class="tone"><span class="rv"><span style="--i: 3">Esto</span></span>&ngsp;<span class="rv"><span style="--i: 4">es</span></span>&ngsp;<span class="rv"><span style="--i: 5">lo</span></span>&ngsp;<span class="rv"><span style="--i: 6">que</span></span>&ngsp;<span class="rv"><span style="--i: 7">viene.</span></span></span>
+            <span class="tone float"><span class="rv" style="--w: 0"><span style="--i: 3">Esto</span></span>&ngsp;<span class="rv" style="--w: 1"><span style="--i: 4">es</span></span>&ngsp;<span class="rv" style="--w: 2"><span style="--i: 5">lo</span></span>&ngsp;<span class="rv" style="--w: 3"><span style="--i: 6">que</span></span>&ngsp;<span class="rv" style="--w: 4"><span style="--i: 7">viene.</span></span></span>
           </h1>
         </div>
         <div class="actions">
@@ -64,7 +55,7 @@ type Sort = 'recent' | 'name' | 'progress' | 'due';
         @let t = svc.totals();
 
         <!-- Indicadores de todos los proyectos -->
-        <section class="kpis">
+        <section class="kpis cascade">
           <div class="kpi"><span class="eyebrow">Proyectos</span><b class="num">{{ t.projects }}</b></div>
           <div class="kpi"><span class="eyebrow">Actividades</span><b class="num">{{ t.total }}</b><small>{{ t.done }} completadas</small></div>
           <div class="kpi"><span class="eyebrow">En proceso</span><b class="num">{{ t.inProgress }}</b><small>{{ t.pending }} pendientes</small></div>
@@ -102,7 +93,7 @@ type Sort = 'recent' | 'name' | 'progress' | 'due';
             @if (!shown().length) {
               <p class="muted none">Ningún proyecto coincide con «{{ query() }}».</p>
             } @else if (layout() === 'grid') {
-              <div class="grid">
+              <div class="grid cascade">
                 @for (p of shown(); track p.id) {
                   @let pct = p.total ? Math.round((p.done / p.total) * 100) : 0;
                   <a class="pcard" [routerLink]="['/p', p.id]">
@@ -148,7 +139,7 @@ type Sort = 'recent' | 'name' | 'progress' | 'due';
                 </button>
               </div>
             } @else {
-              <div class="card table">
+              <div class="card table cascade">
                 <div class="thead">
                   <span class="eyebrow">Proyecto</span>
                   <span class="eyebrow hide-md">Próxima entrega</span>
@@ -182,7 +173,7 @@ type Sort = 'recent' | 'name' | 'progress' | 'due';
           </section>
 
           <!-- Lateral -->
-          <aside class="side">
+          <aside class="side cascade">
             @let a = svc.agenda();
             <section class="card panel agenda">
               <header class="panel-head">
@@ -554,7 +545,7 @@ export class ProjectsPage implements OnInit {
   protected readonly Math = Math;
   private readonly router = inject(Router);
   /** El saludo entra por palabras solo la primera vez por sesion. */
-  protected readonly intro = firstVisit();
+  protected readonly intro = firstVisit('home');
   private readonly toast = inject(ToastService);
 
   protected readonly palette = PALETTE;

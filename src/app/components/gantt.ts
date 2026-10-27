@@ -226,6 +226,13 @@ interface Drag {
       &.done { background: var(--c); }
       &.blocked { background-image: repeating-linear-gradient(135deg, transparent 0 5px, color-mix(in srgb, var(--danger) 22%, transparent) 5px 10px); }
     }
+    /* Al abrir el Gantt las barras crecen desde la izquierda */
+    @media (prefers-reduced-motion: no-preference) {
+      .gbar { animation: bar-grow 0.7s cubic-bezier(0.2, 0.75, 0.2, 1) 0.15s backwards; }
+      .pct { animation: pct-in 0.4s ease-out 0.7s backwards; }
+    }
+    @keyframes bar-grow { from { clip-path: inset(0 100% 0 0 round 999px); } }
+    @keyframes pct-in { from { opacity: 0; } }
     .fill { position: absolute; inset: 0 auto 0 0; background: var(--c); }
     .pct {
       position: absolute; top: 11px; line-height: 18px; font-size: 11px; color: var(--text-3);

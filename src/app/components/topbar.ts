@@ -13,7 +13,7 @@ import { Icon } from './icon';
       <a class="brand" routerLink="/" title="Mis proyectos">
         <svg class="mark" viewBox="0 0 20 20" aria-hidden="true">
           <rect width="20" height="20" rx="6" fill="currentColor" />
-          <path d="M5 6.5h6M7.5 10h7M10 13.5h5" stroke="var(--surface)" stroke-width="2" stroke-linecap="round" />
+          <path class="redraw" pathLength="1" d="M5 6.5h6M7.5 10h7M10 13.5h5" stroke="var(--surface)" stroke-width="2" stroke-linecap="round" />
         </svg>
         <span>Cronograma</span>
       </a>

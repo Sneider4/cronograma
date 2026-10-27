@@ -640,8 +640,53 @@ input[type='radio'] {
   0%, 24%, 100% { transform: none; }
   12% { transform: translateY(-0.09em); }
 }
+// ---------- Entrada de tarjetas y vistas (solo movimiento) ----------
+// Tarjetas en cascada: los hijos de .cascade suben uno tras otro (solo dentro de .motion).
+// fill-mode "backwards" para no dejar transform al terminar (romperia los position: fixed de adentro).
+.motion .cascade > * {
+  animation: rise-in 0.55s cubic-bezier(0.2, 0.75, 0.2, 1) backwards;
+}
+@for $i from 1 through 12 {
+  .motion .cascade > :nth-child(#{$i}) { animation-delay: #{($i - 1) * 60}ms; }
+}
+.motion .cascade > :nth-child(n + 13) { animation-delay: 720ms; }
+.motion .rise-in,
+.motion .fade-up {
+  animation: rise-in 0.6s cubic-bezier(0.2, 0.75, 0.2, 1) var(--delay, 0ms) backwards;
+}
+// Al cambiar de vista (Gantt, Calendario, Kanban, Lista) el contenido entra deslizandose
+.view-in {
+  min-width: 0;
+  animation: view-in 0.4s cubic-bezier(0.2, 0.75, 0.2, 1) backwards;
+}
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(14px); }
+}
+@keyframes view-in {
+  from { opacity: 0; transform: translateY(12px); }
+}
+
+// Logo de la barra superior: sus barras se vuelven a dibujar al pasar el mouse o tocarlo
+.redraw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .brand:hover .redraw,
+  .brand:focus-visible .redraw {
+    animation: redraw 0.9s cubic-bezier(0.6, 0, 0.3, 1);
+  }
+}
+@keyframes redraw {
+  from { stroke-dashoffset: 1; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .motion .rv > span { animation: none; }
+  .motion .rv > span,
+  .motion .cascade > *,
+  .motion .rise-in,
+  .motion .fade-up,
+  .view-in { animation: none; }
 }
 
 // Control segmentado tipo pildora
