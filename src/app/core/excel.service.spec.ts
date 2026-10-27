@@ -137,7 +137,7 @@ describe('ExcelService', () => {
     expect(r.errors.map((e) => e.row)).toEqual([3, 5, 6, 7, 8]);
     expect(r.errors[0].message).toMatch(/nombre/);
     expect(r.errors[1].message).toMatch(/anterior al inicio/);
-    expect(r.errors[2].message).toMatch(/inicio vacia o invalida/);
+    expect(r.errors[2].message).toMatch(/inicio vacía o inválida/);
     expect(r.errors[3].message).toMatch(/Quizas/);
     expect(r.errors[4].message).toMatch(/0 a 100/);
   });

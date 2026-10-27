@@ -161,7 +161,7 @@ export class ExcelService {
     // ---- Objetivos ----
     const wo = wb.addWorksheet('Objetivos', { views: [{ state: 'frozen', ySplit: 1 }] });
     wo.columns = [
-      { key: 'code', header: 'Codigo *', width: 12 },
+      { key: 'code', header: 'Código *', width: 12 },
       { key: 'name', header: 'Nombre del objetivo', width: 70 },
     ];
     styleHeader(wo);
@@ -189,7 +189,7 @@ export class ExcelService {
           operator: 'greaterThan',
           allowBlank: true,
           showErrorMessage: true,
-          errorTitle: 'Fecha invalida',
+          errorTitle: 'Fecha inválida',
           error: 'Escribe una fecha, por ejemplo 15/11/2026.',
           formulae: [new Date(Date.UTC(2000, 0, 1))],
         };
@@ -201,7 +201,7 @@ export class ExcelService {
         showErrorMessage: true,
         errorStyle: 'warning',
         errorTitle: 'Objetivo nuevo',
-        error: 'Ese codigo no esta en la hoja Objetivos. Se creara al importar.',
+        error: 'Ese código no está en la hoja Objetivos. Se creará al importar.',
         formulae: [objRange],
       };
       ws.getCell(`E${r}`).dataValidation = {
@@ -223,7 +223,7 @@ export class ExcelService {
         operator: 'between',
         allowBlank: true,
         showErrorMessage: true,
-        error: 'El avance es un numero entero de 0 a 100.',
+        error: 'El avance es un número entero de 0 a 100.',
         formulae: [0, 100],
       };
     }
@@ -318,14 +318,14 @@ export class ExcelService {
       ['1. Hoja "Tareas"', 'Una fila por actividad, desde la fila 2. No cambies los encabezados.'],
       ['Actividad *', 'Obligatorio. Nombre corto de la actividad.'],
       ['Fecha inicio / fin *', 'Obligatorias. Formato dd/mm/aaaa. La fecha fin no puede ser anterior al inicio.'],
-      ['Objetivo', 'Codigo del objetivo (ej. OE1). Si no existe en la hoja "Objetivos", se crea al importar.'],
+      ['Objetivo', 'Código del objetivo (ej. OE1). Si no existe en la hoja "Objetivos", se crea al importar.'],
       ['Estado', `Lista: ${STATUSES.map((s) => s.label).join(', ')}. Vacio = Pendiente.`],
       ['Prioridad', `Lista: ${PRIORITIES.map((p) => p.label).join(', ')}. Vacio = Media.`],
       ['Avance (%)', 'Numero de 0 a 100. Vacio = 0 (o 100 si el estado es Completada).'],
       ['Entregable, Responsable, Notas, Enlace', 'Opcionales, texto libre.'],
       ['', ''],
-      ['2. Hoja "Objetivos"', 'Opcional. Codigo y nombre de cada objetivo para que la importacion les ponga nombre.'],
-      ['3. Importar', 'En la app: Excel → Importar. Veras una vista previa con los errores antes de guardar.'],
+      ['2. Hoja "Objetivos"', 'Opcional. Código y nombre de cada objetivo para que la importación les ponga nombre.'],
+      ['3. Importar', 'En la app: Excel → Importar. Verás una vista previa con los errores antes de guardar.'],
       ['Agregar vs reemplazar', '"Agregar" suma las filas al cronograma actual. "Reemplazar" borra las tareas actuales primero.'],
       ['', ''],
       ['Ejemplo de fila', ''],
@@ -405,7 +405,7 @@ export class ExcelService {
       const code = cellText(row.getCell(1)).trim().toUpperCase();
       if (!code) return;
       if (code.length > 20) {
-        result.warnings.push({ row: n, message: `Objetivos: el codigo "${code}" es muy largo (max 20), se omite.` });
+        result.warnings.push({ row: n, message: `Objetivos: el código "${code}" es muy largo (máx. 20), se omite.` });
         return;
       }
       result.objectives.push({ code, name: cellText(row.getCell(2)).trim() });
@@ -431,8 +431,8 @@ export class ExcelService {
 
       const start = cellDate(get(row, 'start_date'));
       const end = cellDate(get(row, 'end_date'));
-      if (!start) errs.push('fecha de inicio vacia o invalida');
-      if (!end) errs.push('fecha de fin vacia o invalida');
+      if (!start) errs.push('fecha de inicio vacía o inválida');
+      if (!end) errs.push('fecha de fin vacía o inválida');
       if (start && end && end < start) errs.push('la fecha de fin es anterior al inicio');
 
       const statusRaw = normalize(cellText(get(row, 'status')));
@@ -454,12 +454,12 @@ export class ExcelService {
       let progress = cellPercent(get(row, 'progress'));
       if (progress === null) progress = status === 'completada' ? 100 : 0;
       else if (Number.isNaN(progress) || progress < 0 || progress > 100) {
-        errs.push('el avance debe ser un numero de 0 a 100');
+        errs.push('el avance debe ser un número de 0 a 100');
         progress = 0;
       }
 
       const objective_code = cellText(get(row, 'objective_code')).trim().toUpperCase();
-      if (objective_code.length > 20) errs.push('el codigo de objetivo supera 20 caracteres');
+      if (objective_code.length > 20) errs.push('el código de objetivo supera 20 caracteres');
       else if (objective_code && !known.has(objective_code)) newCodes.add(objective_code);
 
       if (errs.length) {

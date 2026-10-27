@@ -17,12 +17,12 @@ export const supabase: SupabaseClient = createClient(
 
 /** Los errores de las funciones de Postgres llegan como texto crudo. */
 const KNOWN_ERRORS: Record<string, string> = {
-  SIN_SESION: 'Tu sesion expiro. Vuelve a iniciar sesion.',
-  CODIGO_INVALIDO: 'Ese codigo de invitacion no existe.',
-  SOLO_DUENO: 'Solo el dueno del proyecto puede hacer eso.',
-  ULTIMO_DUENO: 'Eres el unico dueno: asigna otro dueno o elimina el proyecto.',
+  SIN_SESION: 'Tu sesión expiró. Vuelve a iniciar sesión.',
+  CODIGO_INVALIDO: 'Ese código de invitación no existe.',
+  SOLO_DUENO: 'Solo el dueño del proyecto puede hacer eso.',
+  ULTIMO_DUENO: 'Eres el único dueño: asigna otro dueño o elimina el proyecto.',
   NO_ERES_MIEMBRO: 'No perteneces a este proyecto.',
-  'Invalid login credentials': 'Correo o contrasena incorrectos.',
+  'Invalid login credentials': 'Correo o contraseña incorrectos.',
   'User already registered': 'Ya existe una cuenta con ese correo.',
   'Email not confirmed': 'Confirma tu correo antes de entrar (revisa tu bandeja).',
   'New password should be different': 'La nueva contraseña debe ser distinta de la anterior.',
@@ -39,7 +39,7 @@ export function friendlyError(err: unknown): string {
   for (const [key, text] of Object.entries(KNOWN_ERRORS)) {
     if (msg.includes(key)) return text;
   }
-  if (msg.includes('objectives_code')) return 'Ya existe un objetivo con ese codigo.';
-  if (msg.includes('Password should be')) return 'La contrasena debe tener al menos 6 caracteres.';
+  if (msg.includes('objectives_code')) return 'Ya existe un objetivo con ese código.';
+  if (msg.includes('Password should be')) return 'La contraseña debe tener al menos 6 caracteres.';
   return msg;
 }
