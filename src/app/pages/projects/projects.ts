@@ -38,8 +38,8 @@ type Sort = 'recent' | 'name' | 'progress' | 'due';
         <div class="intro">
           <span class="tag">Espacio de trabajo</span>
           <h1 [class.motion]="intro">
-            <span class="rv"><span style="--i: 0">{{ greeting() }},</span></span><span class="rv"><span style="--i: 1">{{ firstName() }}.</span></span>
-            <span class="tone"><span class="rv"><span style="--i: 3">Esto</span></span><span class="rv"><span style="--i: 4">es</span></span><span class="rv"><span style="--i: 5">lo</span></span><span class="rv"><span style="--i: 6">que</span></span><span class="rv"><span style="--i: 7">viene.</span></span></span>
+            <span class="rv"><span style="--i: 0">{{ greeting() }},</span></span>&ngsp;<span class="rv"><span style="--i: 1">{{ firstName() }}.</span></span>&ngsp;
+            <span class="tone"><span class="rv"><span style="--i: 3">Esto</span></span>&ngsp;<span class="rv"><span style="--i: 4">es</span></span>&ngsp;<span class="rv"><span style="--i: 5">lo</span></span>&ngsp;<span class="rv"><span style="--i: 6">que</span></span>&ngsp;<span class="rv"><span style="--i: 7">viene.</span></span></span>
           </h1>
         </div>
         <div class="actions">

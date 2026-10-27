@@ -618,7 +618,7 @@ input[type='radio'] {
   vertical-align: top;
   // Aire para que no se corten las letras con cola (g, p, q) ni las tildes
   padding: 0.06em 0 0.12em;
-  margin: -0.06em 0.22em -0.12em 0;
+  margin: -0.06em 0 -0.12em;
   > span { display: inline-block; }
 }
 .motion .rv > span {
@@ -627,6 +627,18 @@ input[type='radio'] {
 }
 @keyframes word-up {
   from { transform: translateY(115%); }
+}
+// Movimiento permanente: las palabras suben y bajan en ola, una tras otra.
+// Se anima la caja exterior (.rv) para no chocar con la entrada ni recortar las letras.
+@media (prefers-reduced-motion: no-preference) {
+  .float .rv {
+    animation: word-float 6s ease-in-out infinite;
+    animation-delay: calc(2.4s + var(--w, 0) * 140ms);
+  }
+}
+@keyframes word-float {
+  0%, 24%, 100% { transform: none; }
+  12% { transform: translateY(-0.09em); }
 }
 @media (prefers-reduced-motion: reduce) {
   .motion .rv > span { animation: none; }

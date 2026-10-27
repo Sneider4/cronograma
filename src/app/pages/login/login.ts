@@ -26,7 +26,7 @@ type Mode = 'in' | 'up' | 'forgot';
         <div class="brand">
           <svg class="mark" viewBox="0 0 20 20" aria-hidden="true">
             <rect width="20" height="20" rx="6" fill="currentColor" />
-            <path d="M5 6.5h6M7.5 10h7M10 13.5h5" stroke="var(--surface)" stroke-width="2" stroke-linecap="round" />
+            <path class="draw" pathLength="1" d="M5 6.5h6M7.5 10h7M10 13.5h5" stroke="var(--surface)" stroke-width="2" stroke-linecap="round" />
           </svg>
           <span>Cronograma</span>
         </div>
@@ -37,21 +37,21 @@ type Mode = 'in' | 'up' | 'forgot';
             @switch (mode()) {
               @case ('in') {
                 <h1>
-                  <span class="rv"><span style="--i: 0">Bienvenido</span></span>
-                  <span class="tone"><span class="rv"><span style="--i: 2">de</span></span><span class="rv"><span style="--i: 3">nuevo</span></span></span>
+                  <span class="rv"><span style="--i: 0">Bienvenido</span></span>&ngsp;
+                  <span class="tone"><span class="rv"><span style="--i: 2">de</span></span>&ngsp;<span class="rv"><span style="--i: 3">nuevo</span></span></span>
                 </h1>
                 <p>Ingresa tus datos para continuar con tu equipo.</p>
               }
               @case ('up') {
                 <h1>
-                  <span class="rv"><span style="--i: 0">Crea</span></span><span class="rv"><span style="--i: 1">tu</span></span>
+                  <span class="rv"><span style="--i: 0">Crea</span></span>&ngsp;<span class="rv"><span style="--i: 1">tu</span></span>&ngsp;
                   <span class="tone"><span class="rv"><span style="--i: 3">cuenta</span></span></span>
                 </h1>
                 <p>Empieza a planear tus proyectos en minutos.</p>
               }
               @case ('forgot') {
                 <h1>
-                  <span class="rv"><span style="--i: 0">Recupera</span></span><span class="rv"><span style="--i: 1">tu</span></span>
+                  <span class="rv"><span style="--i: 0">Recupera</span></span>&ngsp;<span class="rv"><span style="--i: 1">tu</span></span>&ngsp;
                   <span class="tone"><span class="rv"><span style="--i: 3">contraseña</span></span></span>
                 </h1>
                 <p>Escribe tu correo y te enviaremos un enlace para crear una nueva.</p>
@@ -140,7 +140,7 @@ type Mode = 'in' | 'up' | 'forgot';
           <span class="m-brand">
             <svg viewBox="0 0 20 20" aria-hidden="true">
               <rect width="20" height="20" rx="6" fill="currentColor" />
-              <path d="M5 6.5h6M7.5 10h7M10 13.5h5" stroke="#e6e8ec" stroke-width="2" stroke-linecap="round" />
+              <path class="draw" pathLength="1" d="M5 6.5h6M7.5 10h7M10 13.5h5" stroke="#e6e8ec" stroke-width="2" stroke-linecap="round" />
             </svg>
             Cronograma
           </span>
@@ -176,10 +176,10 @@ type Mode = 'in' | 'up' | 'forgot';
           </div>
         </div>
 
-        <h2 style="--d: 450ms">
-          <span class="rv"><span style="--i: 0">Planea</span></span><span class="rv"><span style="--i: 1">desde</span></span><span class="rv"><span style="--i: 2">cero,</span></span><br />
-          <span class="rv"><span style="--i: 3">entregando</span></span><span class="rv"><span style="--i: 4">solo</span></span><br />
-          <span class="tone"><span class="rv"><span style="--i: 6">lo</span></span><span class="rv"><span style="--i: 7">que</span></span><span class="rv"><span style="--i: 8">importa.</span></span></span>
+        <h2 class="float" style="--d: 450ms">
+          <span class="rv" style="--w: 0"><span style="--i: 0">Planea</span></span>&ngsp;<span class="rv" style="--w: 1"><span style="--i: 1">desde</span></span>&ngsp;<span class="rv" style="--w: 2"><span style="--i: 2">cero,</span></span><br />
+          <span class="rv" style="--w: 3"><span style="--i: 3">entregando</span></span>&ngsp;<span class="rv" style="--w: 4"><span style="--i: 4">solo</span></span><br />
+          <span class="tone"><span class="rv" style="--w: 5"><span style="--i: 6">lo</span></span>&ngsp;<span class="rv" style="--w: 6"><span style="--i: 7">que</span></span>&ngsp;<span class="rv" style="--w: 7"><span style="--i: 8">importa.</span></span></span>
         </h2>
 
         <div class="giant">
@@ -559,6 +559,15 @@ type Mode = 'in' | 'up' | 'forgot';
     @keyframes up { from { opacity: 0; transform: translateY(16px); } }
     @keyframes rise-big { from { opacity: 0; transform: translateY(40%); } }
     /* Ola: la letra sube un poco y vuelve; el resto del ciclo descansa */
+    /* Logo: las tres barras se dibujan como un mini Gantt y se borran */
+    @keyframes draw {
+      0% { stroke-dashoffset: 1; }
+      35%, 75% { stroke-dashoffset: 0; }
+      100% { stroke-dashoffset: -1; }
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .draw { stroke-dasharray: 1; animation: draw 5s cubic-bezier(0.6, 0, 0.3, 1) 1s infinite both; }
+    }
     @keyframes wave {
       0%, 22%, 100% { transform: none; }
       11% { transform: translateY(-9%); }

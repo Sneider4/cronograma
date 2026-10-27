@@ -34,8 +34,8 @@ type State = 'checking' | 'form' | 'invalid';
           @case ('invalid') {
             <span class="tag">Enlace vencido</span>
             <h1>
-              <span class="rv"><span style="--i: 0">Este</span></span><span class="rv"><span style="--i: 1">enlace</span></span>
-              <span class="tone"><span class="rv"><span style="--i: 3">ya</span></span><span class="rv"><span style="--i: 4">no</span></span><span class="rv"><span style="--i: 5">sirve</span></span></span>
+              <span class="rv"><span style="--i: 0">Este</span></span>&ngsp;<span class="rv"><span style="--i: 1">enlace</span></span>&ngsp;
+              <span class="tone"><span class="rv"><span style="--i: 3">ya</span></span>&ngsp;<span class="rv"><span style="--i: 4">no</span></span>&ngsp;<span class="rv"><span style="--i: 5">sirve</span></span></span>
             </h1>
             <p class="muted">
               Los enlaces de recuperación vencen en una hora y solo se pueden usar una vez. Pide uno nuevo desde el inicio de sesión.
@@ -50,7 +50,7 @@ type State = 'checking' | 'form' | 'invalid';
             <form (ngSubmit)="save()">
               <span class="tag">Nueva contraseña</span>
               <h1>
-                <span class="rv"><span style="--i: 0">Crea</span></span><span class="rv"><span style="--i: 1">una</span></span><span class="rv"><span style="--i: 2">contraseña</span></span>
+                <span class="rv"><span style="--i: 0">Crea</span></span>&ngsp;<span class="rv"><span style="--i: 1">una</span></span>&ngsp;<span class="rv"><span style="--i: 2">contraseña</span></span>&ngsp;
                 <span class="tone"><span class="rv"><span style="--i: 4">nueva</span></span></span>
               </h1>
               <p class="muted">Para <b>{{ email() }}</b>. Al guardarla entrarás de una vez.</p>
