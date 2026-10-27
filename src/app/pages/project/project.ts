@@ -15,6 +15,7 @@ import { BoardService, Filters } from '../../core/board.service';
 import { ExcelService, ImportResult } from '../../core/excel.service';
 import { diffDays, formatDate, todayISO } from '../../core/dates';
 import { NO_OBJECTIVE_COLOR, STATUSES } from '../../core/models';
+import { CountUp, firstVisit } from '../../core/motion';
 import { loadPref, savePref } from '../../core/prefs';
 import { friendlyError } from '../../core/supabase';
 import { ToastService } from '../../core/toast.service';
@@ -23,7 +24,7 @@ type View = 'gantt' | 'calendario' | 'kanban' | 'lista';
 
 @Component({
   selector: 'app-project',
-  imports: [RouterLink, Topbar, Icon, Gantt, CalendarView, Kanban, TaskList, TaskDialog, ImportDialog, SettingsDialog],
+  imports: [RouterLink, Topbar, Icon, Gantt, CalendarView, Kanban, TaskList, TaskDialog, ImportDialog, SettingsDialog, CountUp],
   providers: [BoardService],
   templateUrl: './project.html',
   styleUrl: './project.scss',
@@ -54,10 +55,16 @@ export class ProjectPage {
   protected readonly importFile = signal('');
   protected readonly settingsTab = signal<'general' | 'objetivos' | 'equipo' | null>(null);
 
+  /** Animacion de entrada solo la primera vez por sesion en cada proyecto. */
+  protected readonly intro = signal(false);
+
   constructor() {
     effect(() => {
       const id = this.id();
-      untracked(() => void this.board.open(id));
+      untracked(() => {
+        this.intro.set(firstVisit(`project.${id}`));
+        void this.board.open(id);
+      });
     });
     effect(() => {
       if (this.board.removed()) {

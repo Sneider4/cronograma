@@ -609,6 +609,41 @@ input[type='radio'] {
   }
 }
 
+// ---------- Animaciones de entrada ----------
+// Titulos por palabras: cada palabra va en <span class="rv"><span style="--i:n">…</span></span>
+// y sube desde una ranura invisible. Solo se anima dentro de un contenedor .motion.
+.rv {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  // Aire para que no se corten las letras con cola (g, p, q) ni las tildes
+  padding: 0.06em 0 0.12em;
+  margin: -0.06em 0.22em -0.12em 0;
+  > span { display: inline-block; }
+}
+.motion {
+  .rv > span {
+    animation: word-up 0.75s cubic-bezier(0.2, 0.75, 0.2, 1) both;
+    animation-delay: calc(var(--d, 0ms) + var(--i, 0) * 80ms);
+  }
+  .fade-up { animation: fade-up 0.6s cubic-bezier(0.2, 0.75, 0.2, 1) both; }
+  .progress > span { animation: bar-fill 1.1s cubic-bezier(0.2, 0.75, 0.2, 1) 0.25s both; }
+}
+@keyframes word-up {
+  from { transform: translateY(115%); }
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+}
+@keyframes bar-fill {
+  from { width: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .motion .rv > span,
+  .motion .fade-up,
+  .motion .progress > span { animation: none; }
+}
+
 // Control segmentado tipo pildora
 .seg {
   display: inline-flex;

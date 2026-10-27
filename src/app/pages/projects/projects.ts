@@ -8,6 +8,7 @@ import { Topbar } from '../../components/topbar';
 import { AuthService } from '../../core/auth.service';
 import { diffDays, formatDate, todayISO } from '../../core/dates';
 import { PALETTE, STATUSES } from '../../core/models';
+import { CountUp, firstVisit } from '../../core/motion';
 import { loadPref, savePref } from '../../core/prefs';
 import { AgendaItem, ProjectsService } from '../../core/projects.service';
 import { friendlyError } from '../../core/supabase';
@@ -18,16 +19,19 @@ type Sort = 'recent' | 'name' | 'progress' | 'due';
 
 @Component({
   selector: 'app-projects',
-  imports: [FormsModule, RouterLink, NgTemplateOutlet, Topbar, Icon],
+  imports: [FormsModule, RouterLink, NgTemplateOutlet, Topbar, Icon, CountUp],
   template: `
     <app-topbar><span class="current">Inicio</span></app-topbar>
 
-    <main class="page">
+    <main class="page" [class.motion]="intro">
       <!-- Saludo -->
       <section class="hero">
         <div class="intro">
           <span class="tag">Espacio de trabajo</span>
-          <h1>{{ greeting() }}, {{ firstName() }}. <span class="tone">Esto es lo que viene.</span></h1>
+          <h1>
+            <span class="rv"><span style="--i: 0">{{ greeting() }},</span></span><span class="rv"><span style="--i: 1">{{ firstName() }}.</span></span>
+            <span class="tone"><span class="rv"><span style="--i: 3">Esto</span></span><span class="rv"><span style="--i: 4">es</span></span><span class="rv"><span style="--i: 5">lo</span></span><span class="rv"><span style="--i: 6">que</span></span><span class="rv"><span style="--i: 7">viene.</span></span></span>
+          </h1>
         </div>
         <div class="actions">
           <button class="btn" (click)="joinOpen.set(true)"><app-icon name="link" /> Unirme con código</button>
@@ -52,13 +56,13 @@ type Sort = 'recent' | 'name' | 'progress' | 'due';
 
         <!-- Indicadores de todos los proyectos -->
         <section class="kpis">
-          <div class="kpi"><span class="eyebrow">Proyectos</span><b class="num">{{ t.projects }}</b></div>
-          <div class="kpi"><span class="eyebrow">Actividades</span><b class="num">{{ t.total }}</b><small>{{ t.done }} completadas</small></div>
-          <div class="kpi"><span class="eyebrow">En proceso</span><b class="num">{{ t.inProgress }}</b><small>{{ t.pending }} pendientes</small></div>
-          <div class="kpi"><span class="eyebrow">Vencidas</span><b class="num" [class.bad]="t.overdue">{{ t.overdue }}</b><small>{{ t.blocked }} bloqueadas</small></div>
+          <div class="kpi"><span class="eyebrow">Proyectos</span><b class="num"><span [countUp]="t.projects" [countUpAnimate]="intro"></span></b></div>
+          <div class="kpi"><span class="eyebrow">Actividades</span><b class="num"><span [countUp]="t.total" [countUpAnimate]="intro"></span></b><small>{{ t.done }} completadas</small></div>
+          <div class="kpi"><span class="eyebrow">En proceso</span><b class="num"><span [countUp]="t.inProgress" [countUpAnimate]="intro"></span></b><small>{{ t.pending }} pendientes</small></div>
+          <div class="kpi"><span class="eyebrow">Vencidas</span><b class="num" [class.bad]="t.overdue"><span [countUp]="t.overdue" [countUpAnimate]="intro"></span></b><small>{{ t.blocked }} bloqueadas</small></div>
           <div class="kpi dark">
             <span class="eyebrow">Avance global</span>
-            <b class="num copper-text">{{ t.progress }}%</b>
+            <b class="num copper-text"><span [countUp]="t.progress" [countUpAnimate]="intro"></span>%</b>
             <div class="progress"><span [style.width.%]="t.progress"></span></div>
           </div>
         </section>
@@ -540,6 +544,8 @@ export class ProjectsPage implements OnInit {
   private readonly auth = inject(AuthService);
   protected readonly Math = Math;
   private readonly router = inject(Router);
+  /** Animacion de entrada solo la primera vez por sesion. */
+  protected readonly intro = firstVisit('home');
   private readonly toast = inject(ToastService);
 
   protected readonly palette = PALETTE;

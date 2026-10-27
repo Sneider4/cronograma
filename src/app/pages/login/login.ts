@@ -21,7 +21,7 @@ type Mode = 'in' | 'up' | 'forgot';
   selector: 'app-login',
   imports: [FormsModule, Icon],
   template: `
-    <main class="split">
+    <main class="split motion">
       <section class="side-form">
         <div class="brand">
           <svg class="mark" viewBox="0 0 20 20" aria-hidden="true">
@@ -36,15 +36,24 @@ type Mode = 'in' | 'up' | 'forgot';
             <span class="tag">{{ mode() === 'in' ? 'Acceso' : mode() === 'up' ? 'Registro' : 'Recuperación' }}</span>
             @switch (mode()) {
               @case ('in') {
-                <h1>Bienvenido <span class="tone">de nuevo</span></h1>
+                <h1>
+                  <span class="rv"><span style="--i: 0">Bienvenido</span></span>
+                  <span class="tone"><span class="rv"><span style="--i: 2">de</span></span><span class="rv"><span style="--i: 3">nuevo</span></span></span>
+                </h1>
                 <p>Ingresa tus datos para continuar con tu equipo.</p>
               }
               @case ('up') {
-                <h1>Crea tu <span class="tone">cuenta</span></h1>
+                <h1>
+                  <span class="rv"><span style="--i: 0">Crea</span></span><span class="rv"><span style="--i: 1">tu</span></span>
+                  <span class="tone"><span class="rv"><span style="--i: 3">cuenta</span></span></span>
+                </h1>
                 <p>Empieza a planear tus proyectos en minutos.</p>
               }
               @case ('forgot') {
-                <h1>Recupera tu <span class="tone">contraseña</span></h1>
+                <h1>
+                  <span class="rv"><span style="--i: 0">Recupera</span></span><span class="rv"><span style="--i: 1">tu</span></span>
+                  <span class="tone"><span class="rv"><span style="--i: 3">contraseña</span></span></span>
+                </h1>
                 <p>Escribe tu correo y te enviaremos un enlace para crear una nueva.</p>
               }
             }
@@ -167,7 +176,11 @@ type Mode = 'in' | 'up' | 'forgot';
           </div>
         </div>
 
-        <h2>Planea desde cero,<br />entregando solo<br /><span class="tone">lo que importa.</span></h2>
+        <h2 style="--d: 450ms">
+          <span class="rv"><span style="--i: 0">Planea</span></span><span class="rv"><span style="--i: 1">desde</span></span><span class="rv"><span style="--i: 2">cero,</span></span><br />
+          <span class="rv"><span style="--i: 3">entregando</span></span><span class="rv"><span style="--i: 4">solo</span></span><br />
+          <span class="tone"><span class="rv"><span style="--i: 6">lo</span></span><span class="rv"><span style="--i: 7">que</span></span><span class="rv"><span style="--i: 8">importa.</span></span></span>
+        </h2>
 
         <div class="giant">CRONOGRAMA</div>
         <div class="strip">
@@ -456,7 +469,6 @@ type Mode = 'in' | 'up' | 'forgot';
       font-weight: 500;
       line-height: 0.98;
       letter-spacing: -0.06em;
-      animation: up 0.8s ease-out 0.25s both;
       .tone { color: #8d9097; }
     }
 
@@ -511,12 +523,20 @@ type Mode = 'in' | 'up' | 'forgot';
       line-height: 1;
       letter-spacing: -0.07em;
       white-space: nowrap;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(11, 11, 12, 0.85) 75%);
+      /* Capa 1: franja cobre que barre la palabra. Capa 2: el degradado base. */
+      background:
+        linear-gradient(100deg, transparent 42%, rgba(232, 150, 88, 0.95) 49%, rgba(194, 101, 42, 0.95) 51%, transparent 58%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(11, 11, 12, 0.85) 75%);
+      background-size: 250% 100%, 100% 100%;
+      background-position: 150% 0, 0 0;
+      background-repeat: no-repeat;
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
       pointer-events: none;
-      animation: rise-big 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s both;
+      animation:
+        gather 1.3s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s both,
+        shine 7s ease-in-out 2.2s infinite;
     }
     .strip {
       position: absolute;
@@ -536,7 +556,15 @@ type Mode = 'in' | 'up' | 'forgot';
     }
 
     @keyframes up { from { opacity: 0; transform: translateY(16px); } }
-    @keyframes rise-big { from { opacity: 0; transform: translateY(40%); } }
+    /* Las letras llegan separadas y desenfocadas y se juntan hasta el tracking final */
+    @keyframes gather {
+      from { opacity: 0; letter-spacing: 0.12em; filter: blur(8px); transform: translateY(12%); }
+    }
+    /* El brillo cruza en el primer 30% del ciclo y luego descansa */
+    @keyframes shine {
+      0% { background-position: 150% 0, 0 0; }
+      30%, 100% { background-position: -50% 0, 0 0; }
+    }
     @keyframes fill { from { transform: scaleX(0); } }
     @keyframes sheen { 0% { transform: translateX(-120%); } 55%, 100% { transform: translateX(120%); } }
     @keyframes nudge { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(6px); } }
