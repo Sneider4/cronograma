@@ -60,9 +60,9 @@ type Sort = 'recent' | 'name' | 'progress' | 'due';
           <div class="kpi"><span class="eyebrow">Actividades</span><b class="num"><span [countUp]="t.total" [countUpAnimate]="intro"></span></b><small>{{ t.done }} completadas</small></div>
           <div class="kpi"><span class="eyebrow">En proceso</span><b class="num"><span [countUp]="t.inProgress" [countUpAnimate]="intro"></span></b><small>{{ t.pending }} pendientes</small></div>
           <div class="kpi"><span class="eyebrow">Vencidas</span><b class="num" [class.bad]="t.overdue"><span [countUp]="t.overdue" [countUpAnimate]="intro"></span></b><small>{{ t.blocked }} bloqueadas</small></div>
-          <div class="kpi dark">
+          <div class="kpi dark glow-card">
             <span class="eyebrow">Avance global</span>
-            <b class="num copper-text"><span [countUp]="t.progress" [countUpAnimate]="intro"></span>%</b>
+            <b class="num brand-text"><span [countUp]="t.progress" [countUpAnimate]="intro"></span>%</b>
             <div class="progress"><span [style.width.%]="t.progress"></span></div>
           </div>
         </section>
@@ -331,36 +331,10 @@ type Sort = 'recent' | 'name' | 'progress' | 'due';
       small { font-size: 12.5px; color: var(--text-3); }
       .bad { color: var(--danger); }
       &.dark {
-        position: relative; overflow: hidden; isolation: isolate;
         background: var(--ink); border-color: var(--ink); color: #fff;
         .eyebrow { color: rgba(255, 255, 255, 0.6); }
         .progress { height: 6px; background: rgba(255, 255, 255, 0.15); }
-        /* Luz cobre que flota dentro de la tarjeta y un destello que la cruza */
-        &::before {
-          content: ''; position: absolute; z-index: -1; right: -20%; top: -60%;
-          width: 60%; aspect-ratio: 1; border-radius: 50%;
-          background: radial-gradient(circle, rgba(214, 125, 64, 0.45), transparent 65%);
-          filter: blur(18px);
-        }
-        &::after {
-          content: ''; position: absolute; inset: 0; z-index: -1;
-          background: linear-gradient(100deg, transparent 35%, rgba(255, 255, 255, 0.08) 50%, transparent 65%);
-          transform: translateX(-100%);
-        }
       }
-    }
-    @media (prefers-reduced-motion: no-preference) {
-      .kpi.dark::before { animation: glow-drift 12s ease-in-out infinite alternate; }
-      .kpi.dark::after { animation: sweep 7s ease-in-out 2s infinite; }
-    }
-    @keyframes glow-drift {
-      0% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(-60%, 50%) scale(1.25); }
-      100% { transform: translate(-120%, 10%) scale(0.9); }
-    }
-    @keyframes sweep {
-      0% { transform: translateX(-100%); }
-      30%, 100% { transform: translateX(100%); }
     }
     /* Agenda: el punto de las vencidas late en rojo */
     .arow .live-dot { --halo: var(--danger); }
@@ -416,7 +390,7 @@ type Sort = 'recent' | 'name' | 'progress' | 'due';
     .nx { display: flex; align-items: center; gap: 8px; font-weight: 500; }
     .ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
     .when {
-      flex: none; padding: 1px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--copper);
+      flex: none; padding: 1px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--brand);
       font-size: 11.5px; font-weight: 600; white-space: nowrap;
       &.bad { background: var(--danger-soft); color: var(--danger); }
     }
@@ -429,7 +403,7 @@ type Sort = 'recent' | 'name' | 'progress' | 'due';
       background: transparent; border: 1.5px dashed var(--border-strong);
       .plus { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: var(--surface-3); }
       b { font-size: 17px; font-weight: 500; letter-spacing: -0.03em; }
-      &:hover { border-color: var(--text); .plus { background: var(--copper-grad); color: #fff; } }
+      &:hover { border-color: var(--text); .plus { background: var(--brand-grad); color: #fff; } }
     }
 
     /* Lista */

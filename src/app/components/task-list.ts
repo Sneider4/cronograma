@@ -85,13 +85,13 @@ type SortKey = 'name' | 'start_date' | 'end_date' | 'objective' | 'status' | 'pr
       &:hover, &.sorted { color: var(--text); }
     }
     .th { display: inline-flex; align-items: center; gap: 4px; }
-    .arrow { color: var(--copper); }
+    .arrow { color: var(--brand); }
     .arrow.up { transform: rotate(180deg); }
     td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
     tbody tr:last-child td { border-bottom: 0; }
     tr:not(.no-hover) { cursor: pointer; }
     tbody tr:not(.no-hover):hover td { background: var(--surface-2); }
-    tbody tr:not(.no-hover):hover .title { color: var(--copper); }
+    tbody tr:not(.no-hover):hover .title { color: var(--brand); }
     .name { display: flex; gap: 10px; align-items: flex-start; min-width: 240px; }
     .title { font-weight: 500; }
     .title.done { text-decoration: line-through; color: var(--text-3); }

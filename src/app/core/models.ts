@@ -58,7 +58,7 @@ export type TaskDraft = Omit<Task, 'id' | 'project_id' | 'created_at' | 'updated
 
 export const STATUSES: { value: Status; label: string; color: string }[] = [
   { value: 'pendiente', label: 'Pendiente', color: '#b4b6bd' },
-  { value: 'en_proceso', label: 'En proceso', color: '#c2652a' },
+  { value: 'en_proceso', label: 'En proceso', color: '#2d5bf0' },
   { value: 'bloqueada', label: 'Bloqueada', color: '#c23a2c' },
   { value: 'completada', label: 'Completada', color: '#0b0b0c' },
 ];
@@ -70,15 +70,15 @@ export const PRIORITIES: { value: Priority; label: string }[] = [
 ];
 
 export const PALETTE = [
-  // Cobre, negro y grises frios, con variaciones para distinguir objetivos.
-  '#c2652a',
+  // Azul, negro y grises frios, con variaciones para distinguir objetivos.
+  '#2d5bf0',
   '#0b0b0c',
   '#8e9097',
-  '#e0914f',
+  '#6f8fff',
   '#4a4b51',
-  '#7a3612',
+  '#15287a',
   '#c4c6cc',
-  '#a8774f',
+  '#5a6f9e',
 ];
 
 export const statusLabel = (s: Status) => STATUSES.find((x) => x.value === s)?.label ?? s;

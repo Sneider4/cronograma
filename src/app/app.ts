@@ -72,7 +72,7 @@ import { ToastService } from './core/toast.service';
         border-radius: 50%;
         background: #6fbf8c;
       }
-      &.info::before { background: var(--copper-light); }
+      &.info::before { background: var(--brand-light); }
       &.error::before { background: #ea6d60; }
     }
   `,

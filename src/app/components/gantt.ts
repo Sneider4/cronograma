@@ -188,7 +188,18 @@ interface Drag {
     .bg { position: absolute; top: 0; bottom: 0; left: var(--left); }
     .col { position: absolute; top: 0; bottom: 0; border-left: 1px solid var(--border); opacity: 0.55; }
     .col.weekend { background: var(--weekend); opacity: 1; }
-    .today-line { position: absolute; top: 0; bottom: 0; width: 0; border-left: 1.5px solid var(--today); z-index: 1; }
+    .today-line {
+      position: absolute; top: 0; bottom: 0; width: 0; border-left: 1.5px solid var(--today); z-index: 1;
+      /* Punto de "hoy" arriba de la linea, que late despacio */
+      &::before {
+        content: ''; position: absolute; top: 2px; left: -4.75px;
+        width: 8px; height: 8px; border-radius: 50%;
+        background: var(--today); --halo: var(--today);
+      }
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .today-line::before { animation: halo 3s ease-out infinite; }
+    }
 
     .scroll.card { border-radius: var(--radius); }
     .row { position: relative; display: flex; height: 42px; border-bottom: 1px solid var(--border); pointer-events: none; }
@@ -206,7 +217,7 @@ interface Drag {
       flex-direction: column; align-items: flex-start; justify-content: center; gap: 0;
       border: 0; border-right: 1px solid var(--border-strong); border-radius: 0; font: inherit; color: inherit;
       text-align: left; cursor: pointer;
-      &:hover { background: var(--surface-2); .name { color: var(--copper); } }
+      &:hover { background: var(--surface-2); .name { color: var(--brand); } }
       .name { font-size: 13px; font-weight: 500; max-width: 100%; line-height: 1.35; }
       .name.done { text-decoration: line-through; color: var(--text-3); }
       .small { max-width: 100%; font-size: 11.5px; }

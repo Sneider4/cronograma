@@ -260,7 +260,7 @@ type Mode = 'in' | 'up' | 'forgot';
       &:focus {
         outline: none;
         background: var(--surface);
-        border-color: var(--copper);
+        border-color: var(--brand);
         box-shadow: 0 0 0 4px var(--focus);
       }
     }
@@ -269,7 +269,7 @@ type Mode = 'in' | 'up' | 'forgot';
       padding: 0; border: 0; background: none; color: var(--text-2);
       font: inherit; font-size: 13px; cursor: pointer;
       text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--border-strong);
-      &:hover { color: var(--copper); text-decoration-color: currentColor; }
+      &:hover { color: var(--brand); text-decoration-color: currentColor; }
     }
     .pass {
       position: relative;
@@ -327,7 +327,7 @@ type Mode = 'in' | 'up' | 'forgot';
       }
       &:hover:not(:disabled) .go {
         transform: rotate(-45deg);
-        background: var(--copper-grad);
+        background: var(--brand-grad);
         color: #fff;
       }
       &:active:not(:disabled) { transform: scale(0.99); }
@@ -343,7 +343,7 @@ type Mode = 'in' | 'up' | 'forgot';
         padding: 0;
         border: 0;
         background: none;
-        color: var(--copper);
+        color: var(--brand);
         font: inherit;
         font-weight: 600;
         cursor: pointer;
@@ -374,7 +374,7 @@ type Mode = 'in' | 'up' | 'forgot';
         linear-gradient(180deg, #e6e8ec 0%, #d5d8dd 100%);
       color: #0b0b0c;
       isolation: isolate;
-      /* Dos luces (cobre y blanca) que flotan detras del contenido */
+      /* Dos luces (azul y blanca) que flotan detras del contenido */
       &::before,
       &::after {
         content: '';
@@ -389,7 +389,7 @@ type Mode = 'in' | 'up' | 'forgot';
       &::before {
         left: -20%;
         top: 30%;
-        background: radial-gradient(circle, rgba(214, 125, 64, 0.38), transparent 65%);
+        background: radial-gradient(circle, rgba(70, 110, 255, 0.38), transparent 65%);
         animation: drift-a 16s ease-in-out infinite alternate;
       }
       &::after {
@@ -517,11 +517,11 @@ type Mode = 'in' | 'up' | 'forgot';
       font-weight: 500;
       letter-spacing: -0.05em;
       &.light { background: #f3f3f4; position: relative; z-index: 4; }
-      &.copper {
+      &.brand {
         position: relative;
         z-index: 3;
         overflow: hidden;
-        background: linear-gradient(120deg, #d98a4a 0%, #b45a23 55%, #6e3012 100%);
+        background: linear-gradient(120deg, #7c9bff 0%, #2d5bf0 55%, #15287a 100%);
         &::after {
           content: '';
           position: absolute;
@@ -540,7 +540,7 @@ type Mode = 'in' | 'up' | 'forgot';
       }
       &.fade { background: #d0d3d9; color: #b3b6bd; margin-right: 0; }
     }
-    .copper-ink { color: #ffc48e; position: relative; z-index: 1; }
+    .brand-ink { color: #b9c9ff; position: relative; z-index: 1; }
 
     .giant {
       position: absolute;
@@ -556,11 +556,11 @@ type Mode = 'in' | 'up' | 'forgot';
       pointer-events: none;
       z-index: 1;
       animation: gather 1.3s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s both;
-      /* Cada letra lleva su degradado; la franja cobre la cruza en ola, letra por letra. */
+      /* Cada letra lleva su degradado; la franja azul la cruza en ola, letra por letra. */
       span {
         display: inline-block;
         background:
-          linear-gradient(100deg, transparent 38%, rgba(236, 156, 96, 0.95) 48%, rgba(194, 101, 42, 0.95) 54%, transparent 64%),
+          linear-gradient(100deg, transparent 38%, rgba(124, 155, 255, 0.95) 48%, rgba(45, 91, 240, 0.95) 54%, transparent 64%),
           linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(11, 11, 12, 0.85) 75%);
         background-size: 300% 100%, 100% 100%;
         background-position: 150% 0, 0 0;
@@ -593,7 +593,7 @@ type Mode = 'in' | 'up' | 'forgot';
     @keyframes gather {
       from { opacity: 0; letter-spacing: 0.12em; filter: blur(8px); transform: translateY(12%); }
     }
-    /* Ola: la letra sube un poco mientras la cruza el cobre; luego descansa el resto del ciclo */
+    /* Ola: la letra sube un poco mientras la cruza el azul; luego descansa el resto del ciclo */
     @keyframes wave {
       0% { transform: none; background-position: 150% 0, 0 0; }
       9% { transform: translateY(-7%); }

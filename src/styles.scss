@@ -1,13 +1,13 @@
 // ============================================================
 // Tokens
-// Estilo: grises frios + negro + acento cobre degradado, grotesca cerrada,
+// Estilo: grises frios + negro + acento azul degradado, grotesca cerrada,
 // botones pildora y tarjetas muy redondeadas.
 // ============================================================
 :root {
-  --copper: #c2652a;
-  --copper-light: #e0914f;
-  --copper-dark: #7a3612;
-  --copper-grad: linear-gradient(120deg, #e39a5a 0%, #c2652a 45%, #7a3612 100%);
+  --brand: #2d5bf0;
+  --brand-light: #6f8fff;
+  --brand-dark: #15287a;
+  --brand-grad: linear-gradient(120deg, #7c9bff 0%, #2d5bf0 45%, #15287a 100%);
   --ink: #0b0b0c;
 
   --bg: #eceef1;
@@ -21,17 +21,17 @@
   --text-3: #9c9ea5;
   --accent: var(--ink);
   --accent-hover: #2b2c30;
-  --accent-soft: #f3e7dd;
-  --accent-2: var(--copper);
+  --accent-soft: #e4eaff;
+  --accent-2: var(--brand);
   --on-accent: #ffffff;
-  --focus: rgba(194, 101, 42, 0.28);
+  --focus: rgba(45, 91, 240, 0.28);
   --danger: #c23a2c;
   --danger-soft: #fbecea;
   --ok: #3f7d55;
   --warn: #b0661f;
   --warn-soft: #fbf1e7;
   --weekend: rgba(11, 11, 12, 0.03);
-  --today: var(--copper);
+  --today: var(--brand);
   --nav-bg: rgba(236, 238, 241, 0.82);
   --nav-text: var(--ink);
   --nav-text-2: #6a6c73;
@@ -60,16 +60,16 @@
   --text-3: #6c6d74;
   --accent: #f1f1f3;
   --accent-hover: #ffffff;
-  --accent-soft: rgba(224, 145, 79, 0.14);
+  --accent-soft: rgba(111, 143, 255, 0.14);
   --on-accent: #0b0b0c;
-  --focus: rgba(224, 145, 79, 0.35);
+  --focus: rgba(111, 143, 255, 0.35);
   --danger: #ea6d60;
   --danger-soft: rgba(234, 109, 96, 0.12);
   --ok: #6fbf8c;
   --warn: #e0914f;
   --warn-soft: rgba(224, 145, 79, 0.12);
   --weekend: rgba(255, 255, 255, 0.025);
-  --today: var(--copper-light);
+  --today: var(--brand-light);
   --nav-bg: rgba(11, 11, 12, 0.8);
   --nav-text: #f1f1f3;
   --nav-text-2: #9b9ca3;
@@ -153,9 +153,9 @@ a {
   font-variant-numeric: tabular-nums;
 }
 
-// Texto de cobre degradado
-.copper-text {
-  background: var(--copper-grad);
+// Texto azul degradado
+.brand-text {
+  background: var(--brand-grad);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -284,7 +284,7 @@ a {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: var(--copper-grad);
+    background: var(--brand-grad);
     color: #fff;
     font-size: 11.5px;
     font-weight: 600;
@@ -381,8 +381,8 @@ a {
       padding-right: 4px;
     }
   }
-  &.copper {
-    background: var(--copper-grad);
+  &.brand {
+    background: var(--brand-grad);
     border-color: transparent;
     color: #fff;
     &:hover:not(:disabled) {
@@ -490,7 +490,7 @@ a {
   }
   &:focus {
     outline: none;
-    border-color: var(--copper);
+    border-color: var(--brand);
     background: var(--surface);
     box-shadow: 0 0 0 3px var(--focus);
   }
@@ -551,7 +551,7 @@ a {
 }
 
 input[type='range'] {
-  accent-color: var(--copper);
+  accent-color: var(--brand);
   width: 100%;
 }
 input[type='color'] {
@@ -565,7 +565,7 @@ input[type='color'] {
 }
 input[type='checkbox'],
 input[type='radio'] {
-  accent-color: var(--copper);
+  accent-color: var(--brand);
 }
 
 // ============================================================
@@ -606,7 +606,7 @@ input[type='radio'] {
     display: block;
     height: 100%;
     border-radius: inherit;
-    background: var(--copper-grad);
+    background: var(--brand-grad);
   }
 }
 
@@ -648,12 +648,12 @@ input[type='radio'] {
 // ---------- Animaciones en vivo (se repiten mientras la pagina esta abierta) ----------
 // Solo si el sistema no pide menos movimiento.
 @media (prefers-reduced-motion: no-preference) {
-  // Brillo cobre que recorre las palabras de un titulo, una tras otra.
+  // Brillo azul que recorre las palabras de un titulo, una tras otra.
   // Uso: <span class="tone glint"> con palabras .rv dentro. --glint-base = color de reposo.
   .glint .rv > span {
     color: transparent;
     background:
-      linear-gradient(100deg, transparent 40%, #e8975a 48%, #c2652a 52%, transparent 60%),
+      linear-gradient(100deg, transparent 40%, #7c9bff 48%, #2d5bf0 52%, transparent 60%),
       linear-gradient(var(--glint-base, #8d9097), var(--glint-base, #8d9097));
     background-size: 300% 100%, 100% 100%;
     background-position: 150% 0, 0 0;
@@ -685,25 +685,72 @@ input[type='radio'] {
       inset: 0;
       background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
       transform: translateX(-100%);
-      animation: flow 2.8s ease-in-out 1.4s infinite;
+      animation: flow var(--flow-dur, 2.8s) ease-in-out 1.4s infinite;
     }
   }
+
+  .glow-card::before { animation: glow-drift var(--glow-dur, 12s) ease-in-out infinite alternate; }
+  .glow-card::after { animation: sweep var(--sweep-dur, 7s) ease-in-out 2s infinite; }
+}
+
+// Tarjeta oscura con una luz azul que flota dentro y un destello que la cruza
+.glow-card {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  &::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    right: -20%;
+    top: -60%;
+    width: 60%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(70, 110, 255, 0.5), transparent 65%);
+    filter: blur(18px);
+    pointer-events: none;
+  }
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(100deg, transparent 35%, rgba(255, 255, 255, 0.08) 50%, transparent 65%);
+    transform: translateX(-100%);
+    pointer-events: none;
+  }
+}
+// Version tranquila para las paginas de trabajo
+.calm {
+  --flow-dur: 6s;
+  --glow-dur: 20s;
+  --sweep-dur: 12s;
+}
+@keyframes glow-drift {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-60%, 50%) scale(1.25); }
+  100% { transform: translate(-120%, 10%) scale(0.9); }
+}
+@keyframes sweep {
+  0% { transform: translateX(-100%); }
+  30%, 100% { transform: translateX(100%); }
 }
 .live-dot {
   display: inline-block;
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--halo, var(--copper));
+  background: var(--halo, var(--brand));
 }
-.tag.live::before { background: var(--copper); --halo: var(--copper); }
+.tag.live::before { background: var(--brand); --halo: var(--brand); }
 
 @keyframes glint {
   0% { background-position: 150% 0, 0 0; }
   28%, 100% { background-position: -50% 0, 0 0; }
 }
 @keyframes halo {
-  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--halo, var(--copper)) 55%, transparent); }
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--halo, var(--brand)) 55%, transparent); }
   80%, 100% { box-shadow: 0 0 0 7px transparent; }
 }
 @keyframes flow {
@@ -888,7 +935,7 @@ input[type='radio'] {
     }
     app-icon {
       margin-top: 2px;
-      color: var(--copper);
+      color: var(--brand);
     }
     span {
       display: flex;
@@ -970,7 +1017,7 @@ input[type='radio'] {
     text-decoration: none;
   }
   .fc-day-today .fc-daygrid-day-number {
-    color: var(--copper);
+    color: var(--brand);
     font-weight: 600;
   }
   .fc-event {
