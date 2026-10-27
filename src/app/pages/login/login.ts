@@ -38,21 +38,21 @@ type Mode = 'in' | 'up' | 'forgot';
               @case ('in') {
                 <h1>
                   <span class="rv"><span style="--i: 0">Bienvenido</span></span>&ngsp;
-                  <span class="tone"><span class="rv"><span style="--i: 2">de</span></span>&ngsp;<span class="rv"><span style="--i: 3">nuevo</span></span></span>
+                  <span class="tone reveal-loop"><span class="rv"><span style="--i: 2">de</span></span>&ngsp;<span class="rv"><span style="--i: 3">nuevo</span></span></span>
                 </h1>
                 <p>Ingresa tus datos para continuar con tu equipo.</p>
               }
               @case ('up') {
                 <h1>
                   <span class="rv"><span style="--i: 0">Crea</span></span>&ngsp;<span class="rv"><span style="--i: 1">tu</span></span>&ngsp;
-                  <span class="tone"><span class="rv"><span style="--i: 3">cuenta</span></span></span>
+                  <span class="tone reveal-loop"><span class="rv"><span style="--i: 3">cuenta</span></span></span>
                 </h1>
                 <p>Empieza a planear tus proyectos en minutos.</p>
               }
               @case ('forgot') {
                 <h1>
                   <span class="rv"><span style="--i: 0">Recupera</span></span>&ngsp;<span class="rv"><span style="--i: 1">tu</span></span>&ngsp;
-                  <span class="tone"><span class="rv"><span style="--i: 3">contraseña</span></span></span>
+                  <span class="tone reveal-loop"><span class="rv"><span style="--i: 3">contraseña</span></span></span>
                 </h1>
                 <p>Escribe tu correo y te enviaremos un enlace para crear una nueva.</p>
               }

@@ -636,6 +636,21 @@ input[type='radio'] {
     animation-delay: calc(2.4s + var(--w, 0) * 140ms);
   }
 }
+// Las palabras se esconden hacia abajo y vuelven a subir cada 7 s (titulo del login).
+@media (prefers-reduced-motion: no-preference) {
+  .motion .reveal-loop .rv > span {
+    animation:
+      word-up 0.75s cubic-bezier(0.2, 0.75, 0.2, 1) both,
+      word-again 7s cubic-bezier(0.6, 0, 0.3, 1) infinite;
+    animation-delay:
+      calc(var(--d, 0ms) + var(--i, 0) * 80ms),
+      calc(3s + var(--i, 0) * 80ms);
+  }
+}
+@keyframes word-again {
+  0%, 80%, 100% { transform: none; }
+  87%, 90% { transform: translateY(115%); }
+}
 @keyframes word-float {
   0%, 24%, 100% { transform: none; }
   12% { transform: translateY(-0.09em); }
