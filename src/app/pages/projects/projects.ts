@@ -228,6 +228,9 @@ type Sort = 'recent' | 'name' | 'progress' | 'due';
           </aside>
         </div>
       }
+      <p class="credit">
+        Cronograma · <a href="https://github.com/Sneider4" target="_blank" rel="noopener">por Richard Malagón</a>
+      </p>
     </main>
 
     <ng-template #row let-i>
@@ -455,6 +458,12 @@ type Sort = 'recent' | 'name' | 'progress' | 'due';
       i { width: 10px; height: 10px; border-radius: 50%; }
       b { font-weight: 600; }
       .faint { text-align: right; font-size: 12px; }
+    }
+
+    /* Credito discreto al final */
+    .credit {
+      margin: 12px 0 0; text-align: center; font-size: 11.5px; color: var(--text-3); opacity: 0.8;
+      a { color: inherit; text-decoration: none; transition: color 0.15s; &:hover { color: var(--text-2); } }
     }
 
     /* ---------- Dialogos ---------- */

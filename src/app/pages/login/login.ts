@@ -120,7 +120,9 @@ type Mode = 'in' | 'up' | 'forgot';
           </p>
         </form>
 
-        <footer>© {{ year }} Cronograma</footer>
+        <footer>
+          © {{ year }} Cronograma · <a class="credit" href="https://github.com/Sneider4" target="_blank" rel="noopener">por Richard Malagón</a>
+        </footer>
       </section>
 
       <section class="side-art" aria-hidden="true">
@@ -336,6 +338,7 @@ type Mode = 'in' | 'up' | 'forgot';
       }
     }
     footer { font-size: 12.5px; color: var(--text-3); }
+    .credit { color: inherit; text-decoration: none; transition: color 0.15s; &:hover { color: var(--text-2); } }
 
     /* ---------- Panel ---------- */
     .side-art {
