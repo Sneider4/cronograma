@@ -57,8 +57,15 @@ nueva. Para que funcione:
    - *Confirm signup* → `confirmar-cuenta.html`, asunto «Confirma tu cuenta en Cronograma».
    - *Reset password* → `recuperar-contrasena.html`, asunto «Restablece tu contraseña de Cronograma».
 3. **Producción**: el correo que trae Supabase solo llega a los miembros del equipo de Supabase y envía muy
-   pocos por hora. Para usuarios reales configura un SMTP propio (por ejemplo Resend o Brevo) en
-   *Authentication → Emails → SMTP Settings*. Ahí también se pone el remitente «Cronograma».
+   pocos por hora. Por eso se envía con la cuenta `cronogramaxi@gmail.com` por SMTP
+   (*Authentication → Emails → SMTP Settings*):
+   - Host `smtp.gmail.com`, puerto `465`, usuario `cronogramaxi@gmail.com`.
+   - Contraseña: una **contraseña de aplicación** de Google (no la normal; requiere verificación en 2 pasos).
+   - Remitente `cronogramaxi@gmail.com`, nombre «Cronograma».
+   - Gmail permite unos 500 correos al día.
+
+Los logos para descargar están en [`public/brand/`](public/brand) y en producción en
+`/brand/cronograma-logo-perfil.png` (foto de perfil, cuadrada) y `/brand/cronograma-logo.png`.
 
 ## Equipo
 
