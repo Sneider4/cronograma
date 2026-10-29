@@ -30,6 +30,7 @@ function task(partial: Partial<Task>): Task {
     priority: 'media',
     progress: 0,
     deliverable: '',
+    assignee_id: null,
     assignee: '',
     notes: '',
     evidence_url: '',

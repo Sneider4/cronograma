@@ -116,13 +116,14 @@ interface Drag {
                 <button class="label task-label" (click)="board.edit(t)" [title]="t.name">
                   <span class="name ellipsis" [class.done]="t.status === 'completada'">{{ t.name }}</span>
                   <span class="faint small ellipsis">
-                    <span class="num">{{ fmt(t.start_date) }} – {{ fmt(t.end_date) }}</span>{{ t.assignee ? ' · ' + t.assignee : '' }}
+                    <span class="num">{{ fmt(t.start_date) }} – {{ fmt(t.end_date) }}</span>{{ board.assigneeName(t) ? ' · ' + board.assigneeName(t) : '' }}
                   </span>
                 </button>
                 <div class="track" [style.width.px]="totalWidth()">
                   <div
                     class="gbar"
                     [class.dragging]="drag()?.id === t.id"
+                    [class.locked]="!board.canEditAll()"
                     [class.done]="t.status === 'completada'"
                     [class.blocked]="t.status === 'bloqueada'"
                     [style.left.px]="g.left"
@@ -222,6 +223,7 @@ interface Drag {
       &::before, &::after { content: ''; position: absolute; top: 0; bottom: 0; width: 7px; cursor: ew-resize; z-index: 2; }
       &::before { left: 0; }
       &::after { right: 0; }
+      &.locked { cursor: pointer; }
       &.dragging { cursor: grabbing; border-color: var(--c); box-shadow: var(--shadow); z-index: 2; }
       &.done { background: var(--c); }
       &.blocked { background-image: repeating-linear-gradient(135deg, transparent 0 5px, color-mix(in srgb, var(--danger) 22%, transparent) 5px 10px); }
@@ -476,7 +478,7 @@ export class Gantt implements AfterViewInit {
       `${formatDate(t.start_date)} → ${formatDate(t.end_date)}`,
       `${statusLabel(t.status)} · ${t.progress}%`,
       obj ? `${obj.code} ${obj.name}` : '',
-      t.assignee ? `Responsable: ${t.assignee}` : '',
+      this.board.assigneeName(t) ? `Responsable: ${this.board.assigneeName(t)}` : '',
     ]
       .filter(Boolean)
       .join('\n');
@@ -488,16 +490,19 @@ export class Gantt implements AfterViewInit {
 
   // ---------- Arrastre ----------
 
-  private lastPointer = 'mouse';
+  private tapOnly = false;
 
-  /** En pantallas tactiles la barra no se arrastra (asi el dedo desplaza la vista); un toque la abre. */
+  /**
+   * En pantallas tactiles la barra no se arrastra (asi el dedo desplaza la vista); un toque la abre.
+   * Un integrante tampoco la arrastra: solo el dueno cambia fechas.
+   */
   protected tap(t: Task) {
-    if (this.lastPointer === 'touch') this.board.edit(t);
+    if (this.tapOnly) this.board.edit(t);
   }
 
   protected down(ev: PointerEvent, t: Task) {
-    this.lastPointer = ev.pointerType;
-    if (ev.pointerType === 'touch') return;
+    this.tapOnly = ev.pointerType === 'touch' || !this.board.canEditAll();
+    if (this.tapOnly) return;
     if (ev.button !== 0) return;
     const el = ev.currentTarget as HTMLElement;
     const rect = el.getBoundingClientRect();
@@ -537,6 +542,7 @@ export class Gantt implements AfterViewInit {
   }
 
   protected createAt(ev: MouseEvent) {
+    if (!this.board.canEditAll()) return;
     const el = ev.currentTarget as HTMLElement;
     const x = ev.clientX - el.getBoundingClientRect().left;
     const date = addDays(this.range().start, Math.floor(x / this.px()));

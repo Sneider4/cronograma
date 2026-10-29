@@ -26,7 +26,16 @@ export interface Filters {
 
 const EMPTY_FILTERS: Filters = { search: '', objective: 'all', status: 'all', assignee: 'all' };
 
-export type ImportRow = Omit<TaskDraft, 'objective_id'> & { objective_code: string };
+/** Fila leida del Excel: el responsable llega como texto y se vincula al importar. */
+export type ImportRow = Omit<TaskDraft, 'objective_id' | 'assignee_id'> & { objective_code: string };
+
+/** Opcion del filtro de responsables: 'u:<id>' = miembro, 'x:<nombre>' = otra persona. */
+export interface AssigneeOption {
+  value: string;
+  name: string;
+  avatar: string;
+  member: boolean;
+}
 
 /**
  * Estado de UN proyecto abierto. Se provee en la pagina del proyecto, asi
@@ -59,7 +68,15 @@ export class BoardService implements OnDestroy {
     const uid = this.auth.user()?.id;
     return this.members().find((m) => m.user_id === uid)?.role ?? null;
   });
+  /** Administra el proyecto (nombre, equipo, roles, codigo). */
   readonly isOwner = computed(() => this.myRole() === 'owner');
+  /** Crea, borra y edita cualquier actividad u objetivo, e importa Excel. */
+  readonly canEditAll = computed(() => this.myRole() === 'owner' || this.myRole() === 'editor');
+  /** Ve todas las actividades (el integrante solo ve las suyas). */
+  readonly canSeeAll = computed(() => this.canEditAll() || this.myRole() === 'contributor');
+  readonly myId = computed(() => this.auth.user()?.id ?? null);
+
+  readonly memberMap = computed(() => new Map(this.members().map((m) => [m.user_id, m])));
 
   readonly objectiveMap = computed(() => new Map(this.objectives().map((o) => [o.id, o])));
 
@@ -72,13 +89,52 @@ export class BoardService implements OnDestroy {
     ),
   );
 
-  /** Responsables conocidos: miembros + lo que ya se haya escrito en tareas. */
-  readonly assignees = computed(() => {
-    const names = new Set<string>();
-    for (const m of this.members()) if (m.profile?.full_name) names.add(m.profile.full_name);
-    for (const t of this.tasks()) if (t.assignee.trim()) names.add(t.assignee.trim());
-    return [...names].sort((a, b) => a.localeCompare(b));
+  /** Filtro de responsables: miembros del equipo y luego otras personas escritas a mano. */
+  readonly assignees = computed<AssigneeOption[]>(() => {
+    const members = this.members().map((m) => ({
+      value: 'u:' + m.user_id,
+      name: m.profile?.full_name || m.profile?.email || 'Sin nombre',
+      avatar: m.profile?.avatar ?? '',
+      member: true,
+    }));
+    const others = new Set<string>();
+    for (const t of this.tasks()) if (!t.assignee_id && t.assignee.trim()) others.add(t.assignee.trim());
+    return [
+      ...members.sort((a, b) => a.name.localeCompare(b.name)),
+      ...[...others].sort((a, b) => a.localeCompare(b)).map((n) => ({ value: 'x:' + n, name: n, avatar: '', member: false })),
+    ];
   });
+
+  /** Nombre que se muestra del responsable (el del perfil, que siempre esta al dia). */
+  assigneeName(t: Pick<Task, 'assignee_id' | 'assignee'>): string {
+    if (t.assignee_id) {
+      const p = this.memberMap().get(t.assignee_id)?.profile;
+      return p?.full_name || p?.email || t.assignee || 'Miembro del equipo';
+    }
+    return t.assignee.trim();
+  }
+
+  assigneeAvatar(t: Pick<Task, 'assignee_id'>): string {
+    return (t.assignee_id && this.memberMap().get(t.assignee_id)?.profile?.avatar) || '';
+  }
+
+  /** Puede cambiar estado y avance de esta actividad (la suya, o todas si edita todo). */
+  canUpdate(t: Pick<Task, 'assignee_id'>): boolean {
+    return this.canEditAll() || (!!t.assignee_id && t.assignee_id === this.myId());
+  }
+
+  /** Busca al miembro por nombre, correo o la parte del correo antes de la @. */
+  matchMember(text: string): Member | null {
+    const q = normalize(text);
+    if (!q) return null;
+    return (
+      this.members().find((m) => {
+        const p = m.profile;
+        if (!p) return false;
+        return [p.full_name, p.email, p.email.split('@')[0]].some((v) => v && normalize(v) === q);
+      }) ?? null
+    );
+  }
 
   readonly filteredTasks = computed(() => {
     const f = this.filters();
@@ -91,9 +147,12 @@ export class BoardService implements OnDestroy {
       if (f.status === 'vencidas') {
         if (!isOverdue(t, today)) return false;
       } else if (f.status !== 'all' && t.status !== f.status) return false;
-      if (f.assignee !== 'all' && t.assignee.trim() !== f.assignee) return false;
+      if (f.assignee !== 'all') {
+        const key = t.assignee_id ? 'u:' + t.assignee_id : t.assignee.trim() ? 'x:' + t.assignee.trim() : 'none';
+        if (key !== f.assignee) return false;
+      }
       if (q) {
-        const hay = normalize(`${t.name} ${t.deliverable} ${t.assignee} ${t.notes}`);
+        const hay = normalize(`${t.name} ${t.deliverable} ${this.assigneeName(t)} ${t.notes}`);
         if (!hay.includes(q)) return false;
       }
       return true;
@@ -156,7 +215,7 @@ export class BoardService implements OnDestroy {
   private async fetchMembers(projectId: string): Promise<Member[]> {
     const { data, error } = await supabase
       .from('project_members')
-      .select('*, profile:profiles(id, full_name, email)')
+      .select('*, profile:profiles(id, full_name, email, avatar)')
       .eq('project_id', projectId)
       .order('joined_at');
     if (error) throw error;
@@ -206,7 +265,21 @@ export class BoardService implements OnDestroy {
           this.removed.set(true);
           return;
         }
-        this.fetchMembers(projectId).then((m) => this.members.set(m)).catch(() => {});
+        const before = this.myRole();
+        this.fetchMembers(projectId)
+          .then((m) => {
+            this.members.set(m);
+            if (this.myRole() !== before) void this.reload();
+          })
+          .catch(() => {});
+      })
+      // Nombre y avatar del equipo en vivo.
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, (p) => {
+        const row = p.new as { id: string; full_name: string; email: string; avatar?: string };
+        if (!this.memberMap().has(row.id)) return;
+        this.members.update((list) =>
+          list.map((m) => (m.user_id === row.id ? { ...m, profile: { ...m.profile, ...row } } : m)),
+        );
       })
       .subscribe();
   }
@@ -233,8 +306,17 @@ export class BoardService implements OnDestroy {
     if (id) target.update((list) => list.filter((x) => x.id !== id));
   }
 
+  private readonly onVisible = () => {
+    if (document.visibilityState === 'visible' && this.project() && !this.canSeeAll()) void this.reload();
+  };
+
+  constructor() {
+    document.addEventListener('visibilitychange', this.onVisible);
+  }
+
   ngOnDestroy() {
     this.channel?.unsubscribe();
+    document.removeEventListener('visibilitychange', this.onVisible);
   }
 
   // ------------------------------------------------------------------
@@ -252,6 +334,7 @@ export class BoardService implements OnDestroy {
       // Si hay un objetivo filtrado, la nueva actividad nace en el.
       objective_id: ['all', 'none'].includes(this.filters().objective) ? null : this.filters().objective,
       deliverable: '',
+      assignee_id: null,
       assignee: '',
       notes: '',
       evidence_url: '',
@@ -304,9 +387,14 @@ export class BoardService implements OnDestroy {
   async importTasks(rows: ImportRow[], objectives: { code: string; name: string }[], replace: boolean) {
     const project = this.project();
     if (!project) return 0;
+    // El responsable del Excel se vincula al miembro que coincida; si no, queda como otra persona.
+    const linked = rows.map((r) => {
+      const m = this.matchMember(r.assignee);
+      return m ? { ...r, assignee_id: m.user_id, assignee: m.profile?.full_name ?? r.assignee } : { ...r, assignee_id: null };
+    });
     const { data, error } = await supabase.rpc('import_tasks', {
       p_project: project.id,
-      p_tasks: rows,
+      p_tasks: linked,
       p_objectives: objectives,
       p_replace: replace,
     });

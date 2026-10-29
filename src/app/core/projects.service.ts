@@ -12,6 +12,7 @@ export interface TaskLite {
   start_date: string;
   end_date: string;
   assignee: string;
+  assignee_id: string | null;
 }
 
 export interface ProjectSummary extends Project {
@@ -79,10 +80,11 @@ export class ProjectsService {
   async load() {
     this.loading.set(true);
     try {
-      // RLS ya filtra: solo llegan los proyectos de los que soy miembro.
+      // RLS ya filtra: solo llegan los proyectos de los que soy miembro, y de los que no soy
+      // dueno, solo mis actividades.
       const { data, error } = await supabase
         .from('projects')
-        .select('*, tasks(id, name, status, start_date, end_date, assignee), project_members(count)')
+        .select('*, tasks(id, name, status, start_date, end_date, assignee, assignee_id), project_members(count)')
         .order('created_at', { ascending: false });
       if (error) throw error;
 

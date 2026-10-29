@@ -4,11 +4,12 @@ import { Component, computed, inject } from '@angular/core';
 import { BoardService, isOverdue } from '../core/board.service';
 import { formatDate, todayISO } from '../core/dates';
 import { STATUSES, Status, Task, priorityLabel } from '../core/models';
+import { Avatar } from './avatar';
 import { Icon } from './icon';
 
 @Component({
   selector: 'app-kanban',
-  imports: [CdkDropListGroup, CdkDropList, CdkDrag, Icon],
+  imports: [CdkDropListGroup, CdkDropList, CdkDrag, Icon, Avatar],
   template: `
     <div class="board" cdkDropListGroup>
       @for (col of columns(); track col.value) {
@@ -16,13 +17,15 @@ import { Icon } from './icon';
           <header [style.--s]="col.color">
             <h4>{{ col.label }}</h4>
             <span class="count">{{ col.tasks.length }}</span>
-            <button class="btn sm ghost icon add" (click)="add(col.value)" title="Nueva actividad en esta columna" aria-label="Nueva actividad">
-              <app-icon name="plus" [size]="15" />
-            </button>
+            @if (board.canEditAll()) {
+              <button class="btn sm ghost icon add" (click)="add(col.value)" title="Nueva actividad en esta columna" aria-label="Nueva actividad">
+                <app-icon name="plus" [size]="15" />
+              </button>
+            }
           </header>
           <div class="list" cdkDropList [cdkDropListData]="col.value" (cdkDropListDropped)="drop($event)">
             @for (t of col.tasks; track t.id) {
-              <article class="item" cdkDrag [cdkDragData]="t" [cdkDragStartDelay]="{ touch: 300, mouse: 0 }" (click)="board.edit(t)" [style.--c]="board.colorOf(t)">
+              <article class="item" cdkDrag [cdkDragData]="t" [cdkDragDisabled]="!board.canUpdate(t)" [cdkDragStartDelay]="{ touch: 300, mouse: 0 }" (click)="board.edit(t)" [style.--c]="board.colorOf(t)">
                 <div class="top">
                   @if (board.objectiveOf(t); as o) {
                     <span class="chip"><span class="dot" [style.background]="o.color"></span>{{ o.code }}</span>
@@ -32,8 +35,8 @@ import { Icon } from './icon';
                 <p class="name">{{ t.name }}</p>
                 <div class="meta">
                   <span class="num" [class.late]="late(t)">{{ fmt(t.start_date) }} – {{ fmt(t.end_date) }}</span>
-                  @if (t.assignee) {
-                    <span class="who" [title]="t.assignee">{{ initials(t.assignee) }}</span>
+                  @if (board.assigneeName(t); as who) {
+                    <app-avatar [avatar]="board.assigneeAvatar(t)" [name]="who" [ghost]="!t.assignee_id" [size]="26" />
                   }
                 </div>
                 @if (t.progress > 0 && t.status !== 'completada') {
@@ -81,10 +84,7 @@ import { Icon } from './icon';
     .name { margin: 0; font-size: 15px; font-weight: 500; line-height: 1.3; letter-spacing: -0.02em; }
     .meta { display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--text-2); }
     .late { color: var(--danger); font-weight: 600; }
-    .who {
-      display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%;
-      background: var(--ink); color: #fff; font-size: 10px; font-weight: 600;
-    }
+
     .progress > span { background: var(--c); }
     /* Movil: una columna casi a lo ancho y se desliza de lado, ajustando cada columna */
     @media (max-width: 640px) {
@@ -144,12 +144,4 @@ export class Kanban {
     return priorityLabel(p);
   }
 
-  protected initials(name: string) {
-    return name
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((w) => w[0]!.toUpperCase())
-      .join('');
-  }
 }

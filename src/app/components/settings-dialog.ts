@@ -4,9 +4,10 @@ import { Router } from '@angular/router';
 
 import { AuthService } from '../core/auth.service';
 import { BoardService } from '../core/board.service';
-import { Member, PALETTE, Role } from '../core/models';
+import { Member, PALETTE, ROLES, Role, roleLabel } from '../core/models';
 import { friendlyError } from '../core/supabase';
 import { ToastService } from '../core/toast.service';
+import { Avatar } from './avatar';
 import { Icon } from './icon';
 
 type Tab = 'general' | 'objetivos' | 'equipo';
@@ -20,7 +21,7 @@ interface ObjectiveDraft {
 
 @Component({
   selector: 'app-settings-dialog',
-  imports: [FormsModule, Icon],
+  imports: [FormsModule, Icon, Avatar],
   template: `
     <div class="backdrop" (mousedown)="closed.emit()">
       <div class="dialog wide" (mousedown)="$event.stopPropagation()">
@@ -77,7 +78,19 @@ interface ObjectiveDraft {
               <p class="small muted">
                 Los objetivos agrupan las actividades y les dan color. El <b>código</b> es lo que se escribe en la
                 columna «Objetivo» del Excel.
+                @if (!board.canEditAll()) {
+                  <br />Solo el dueño o un editor puede crearlos o cambiarlos.
+                }
               </p>
+              @if (!board.canEditAll()) {
+                <div class="obj-list">
+                  @for (o of board.objectives(); track o.id) {
+                    <div class="obj-view"><span class="dot" [style.background]="o.color"></span><b class="mono">{{ o.code }}</b><span>{{ o.name || '—' }}</span></div>
+                  } @empty {
+                    <span class="small faint">Aún no hay objetivos.</span>
+                  }
+                </div>
+              } @else {
               <div class="obj-list">
                 @for (o of drafts(); track $index) {
                   <div class="obj-row">
@@ -94,6 +107,7 @@ interface ObjectiveDraft {
                 }
               </div>
               <div><button class="btn" (click)="addDraft()"><app-icon name="plus" /> Agregar objetivo</button></div>
+              }
             }
 
             @case ('equipo') {
@@ -102,7 +116,7 @@ interface ObjectiveDraft {
                   <div>
                     <span class="eyebrow">Código de invitación</span>
                     <div class="code-big mono">{{ p.invite_code }}</div>
-                    <span class="small faint">Quien tenga el código entra como editor desde «Unirme con código».</span>
+                    <span class="small faint">Quien tenga el código entra como <b>integrante</b> desde «Unirme con código».</span>
                   </div>
                   <div class="col">
                     <button class="btn" (click)="copy(p.invite_code)"><app-icon name="copy" [size]="15" /> Copiar código</button>
@@ -113,22 +127,28 @@ interface ObjectiveDraft {
                 </div>
               }
 
+              <ul class="roles-help small">
+                @for (r of roles; track r.value) {
+                  <li><b>{{ r.label }}:</b> {{ r.help }}</li>
+                }
+              </ul>
               <div class="members">
                 @for (m of board.members(); track m.user_id) {
                   <div class="member">
-                    <span class="avatar">{{ initials(m) }}</span>
+                    <app-avatar [avatar]="m.profile?.avatar" [name]="m.profile?.full_name || m.profile?.email" [size]="36" />
                     <div class="who">
                       <b>{{ m.profile?.full_name || 'Sin nombre' }}{{ m.user_id === me() ? ' (tú)' : '' }}</b>
                       <span class="small faint">{{ m.profile?.email }}</span>
                     </div>
                     @if (board.isOwner() && m.user_id !== me()) {
                       <select class="select sm role" [value]="m.role" (change)="setRole(m, $any($event.target).value)">
-                        <option value="editor" [selected]="m.role === 'editor'">Editor</option>
-                        <option value="owner" [selected]="m.role === 'owner'">Dueño</option>
+                        @for (r of roles; track r.value) {
+                          <option [value]="r.value" [selected]="m.role === r.value">{{ r.label }}</option>
+                        }
                       </select>
                       <button class="btn sm danger" (click)="removeMember(m)">Quitar</button>
                     } @else {
-                      <span class="chip">{{ m.role === 'owner' ? 'Dueño' : 'Editor' }}</span>
+                      <span class="chip">{{ roleName(m.role) }}</span>
                     }
                   </div>
                 }
@@ -170,12 +190,13 @@ interface ObjectiveDraft {
     .code-big { margin: 2px 0; font-size: 26px; font-weight: 600; letter-spacing: 0.18em; color: var(--text); }
     .members { display: flex; flex-direction: column; }
     .member { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
-    .avatar {
-      display: grid; place-items: center; flex: none; width: 32px; height: 32px; border-radius: 50%;
-      background: var(--surface-3); color: var(--text-2); font-size: 12px; font-weight: 600;
+    .obj-view {
+      display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border);
+      .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
     }
+    .roles-help { margin: 4px 0 0; padding-left: 18px; color: var(--text-2); display: grid; gap: 2px; }
     .who { display: flex; flex-direction: column; flex: 1; min-width: 0; }
-    .role { width: 110px; }
+    .role { width: 136px; }
     @media (max-width: 640px) {
       .tabs { overflow-x: auto; padding: 0 10px; button { flex: none; white-space: nowrap; } }
       .obj-list { gap: 0; }
@@ -188,7 +209,7 @@ interface ObjectiveDraft {
       .code-big { font-size: 24px; }
       .member { flex-wrap: wrap; row-gap: 8px; }
       .who { flex: 1 1 calc(100% - 50px); }
-      .role { margin-left: 44px; flex: 1; width: auto; }
+      .role { margin-left: 48px; flex: 1; width: auto; }
     }
   `,
 })
@@ -205,6 +226,8 @@ export class SettingsDialog implements OnInit {
   protected readonly busy = signal(false);
   protected readonly drafts = signal<ObjectiveDraft[]>([]);
   protected readonly palette = PALETTE;
+  protected readonly roles = ROLES;
+  protected readonly roleName = roleLabel;
   protected readonly me = () => this.auth.user()?.id;
 
   protected name = '';
@@ -299,7 +322,7 @@ export class SettingsDialog implements OnInit {
   }
 
   protected removeMember(m: Member) {
-    if (!confirm(`¿Quitar a ${m.profile?.full_name || 'este miembro'} del proyecto?`)) return;
+    if (!confirm(`¿Quitar a ${m.profile?.full_name || 'este miembro'} del proyecto? Sus actividades quedarán sin responsable.`)) return;
     return this.run(() => this.board.removeMember(m.user_id), 'Miembro quitado');
   }
 
@@ -318,14 +341,5 @@ export class SettingsDialog implements OnInit {
     }
   }
 
-  protected initials(m: Member) {
-    const n = m.profile?.full_name || m.profile?.email || '?';
-    return n
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((w) => w[0]!.toUpperCase())
-      .join('');
-  }
 }
 

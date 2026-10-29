@@ -3,13 +3,14 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { BoardService, isOverdue } from '../core/board.service';
 import { diffDays, formatDate, todayISO } from '../core/dates';
 import { PRIORITIES, Priority, STATUSES, Status, Task, statusColor } from '../core/models';
+import { Avatar } from './avatar';
 import { Icon } from './icon';
 
 type SortKey = 'name' | 'start_date' | 'end_date' | 'objective' | 'status' | 'priority' | 'progress' | 'assignee';
 
 @Component({
   selector: 'app-task-list',
-  imports: [Icon],
+  imports: [Icon, Avatar],
   template: `
     <div class="card wrap">
       <table>
@@ -48,7 +49,7 @@ type SortKey = 'name' | 'start_date' | 'end_date' | 'objective' | 'status' | 'pr
               </td>
               <td class="hide-md">{{ board.objectiveOf(t)?.code ?? '—' }}</td>
               <td (click)="$event.stopPropagation()">
-                <select class="select sm status" [value]="t.status" [style.--c]="statusColor(t.status)"
+                <select class="select sm status" [value]="t.status" [disabled]="!board.canUpdate(t)" [style.--c]="statusColor(t.status)"
                         (change)="setStatus(t, $any($event.target).value)">
                   @for (s of statuses; track s.value) {
                     <option [value]="s.value" [selected]="s.value === t.status">{{ s.label }}</option>
@@ -56,7 +57,7 @@ type SortKey = 'name' | 'start_date' | 'end_date' | 'objective' | 'status' | 'pr
                 </select>
               </td>
               <td class="hide-md" (click)="$event.stopPropagation()">
-                <select class="select sm" [value]="t.priority" (change)="setPriority(t, $any($event.target).value)">
+                <select class="select sm" [value]="t.priority" [disabled]="!board.canEditAll()" (change)="setPriority(t, $any($event.target).value)">
                   @for (p of priorities; track p.value) {
                     <option [value]="p.value" [selected]="p.value === t.priority">{{ p.label }}</option>
                   }
@@ -66,7 +67,13 @@ type SortKey = 'name' | 'start_date' | 'end_date' | 'objective' | 'status' | 'pr
                 <div class="progress"><span [style.width.%]="t.progress" [style.background]="board.colorOf(t)"></span></div>
                 <span class="small muted num">{{ t.progress }}%</span>
               </td>
-              <td class="hide-md">{{ t.assignee || '—' }}</td>
+              <td class="hide-md">
+                @if (board.assigneeName(t); as who) {
+                  <span class="who"><app-avatar [avatar]="board.assigneeAvatar(t)" [name]="who" [ghost]="!t.assignee_id" [size]="24" />{{ who }}</span>
+                } @else {
+                  —
+                }
+              </td>
             </tr>
           } @empty {
             <tr class="no-hover"><td colspan="8" class="muted center">Ninguna actividad coincide con los filtros.</td></tr>
@@ -97,6 +104,7 @@ type SortKey = 'name' | 'start_date' | 'end_date' | 'objective' | 'status' | 'pr
     .title.done { text-decoration: line-through; color: var(--text-3); }
     .swatch { flex: none; width: 9px; height: 9px; margin-top: 6px; border-radius: 50%; }
     .nowrap { white-space: nowrap; }
+    .who { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
     .late { color: var(--danger); font-weight: 600; }
     .status { width: 136px; box-shadow: inset 3px 0 0 var(--c); }
     .select.sm { height: 32px; font-size: 12.5px; border-radius: 999px; padding: 0 12px; }
@@ -163,6 +171,8 @@ export class TaskList {
           return prioRank[t.priority];
         case 'progress':
           return t.progress;
+        case 'assignee':
+          return this.board.assigneeName(t).toLowerCase() || '~';
         default:
           return (t[key] as string).toLowerCase();
       }

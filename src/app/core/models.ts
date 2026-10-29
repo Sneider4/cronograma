@@ -1,11 +1,21 @@
 export type Status = 'pendiente' | 'en_proceso' | 'bloqueada' | 'completada';
 export type Priority = 'alta' | 'media' | 'baja';
-export type Role = 'owner' | 'editor';
+export type Role = 'owner' | 'editor' | 'contributor' | 'member';
+
+export const ROLES: { value: Role; label: string; help: string }[] = [
+  { value: 'owner', label: 'Dueño', help: 'Ve y edita todo, y administra el proyecto y el equipo.' },
+  { value: 'editor', label: 'Editor', help: 'Ve y edita todas las actividades, los objetivos y el Excel.' },
+  { value: 'contributor', label: 'Colaborador', help: 'Ve todo el proyecto y actualiza solo sus actividades.' },
+  { value: 'member', label: 'Integrante', help: 'Ve y actualiza solo sus actividades.' },
+];
+export const roleLabel = (r: Role) => ROLES.find((x) => x.value === r)?.label ?? r;
 
 export interface Profile {
   id: string;
   full_name: string;
   email: string;
+  /** Clave del avatar elegido (ver core/avatars.ts); vacio = iniciales. */
+  avatar?: string;
 }
 
 export interface Project {
@@ -47,6 +57,9 @@ export interface Task {
   priority: Priority;
   progress: number;
   deliverable: string;
+  /** Miembro responsable. Si es null, 'assignee' guarda el nombre de otra persona (sin cuenta). */
+  assignee_id: string | null;
+  /** Nombre de otra persona, o copia del nombre del miembro. */
   assignee: string;
   notes: string;
   evidence_url: string;

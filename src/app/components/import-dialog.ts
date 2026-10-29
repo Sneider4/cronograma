@@ -55,6 +55,13 @@ const PREVIEW = 60;
             </div>
           }
 
+          @if (others().length) {
+            <div class="callout">
+              No están en el equipo y quedarán como <b>otra persona</b>: {{ others().join(', ') }}.
+              Si son compañeros, invítalos antes de importar para que vean sus actividades.
+            </div>
+          }
+
           @if (result().newObjectiveCodes.length) {
             <div class="callout">
               Se crearán los objetivos: <b>{{ result().newObjectiveCodes.join(', ') }}</b>.
@@ -79,7 +86,15 @@ const PREVIEW = 60;
                       <td>{{ status(r.status) }}</td>
                       <td>{{ prio(r.priority) }}</td>
                       <td>{{ r.progress }}</td>
-                      <td>{{ r.assignee || '—' }}</td>
+                      <td>
+                        @if (board.matchMember(r.assignee); as m) {
+                          {{ m.profile?.full_name }}
+                        } @else if (r.assignee) {
+                          {{ r.assignee }} <span class="faint">(otra persona)</span>
+                        } @else {
+                          —
+                        }
+                      </td>
                     </tr>
                   }
                 </tbody>
@@ -156,6 +171,13 @@ export class ImportDialog {
   protected readonly preview = PREVIEW;
   protected readonly mode = signal<'append' | 'replace'>('append');
   protected readonly busy = signal(false);
+
+  /** Responsables del Excel que no coinciden con nadie del equipo. */
+  protected readonly others = computed(() => {
+    const names = new Set<string>();
+    for (const r of this.result().rows) if (r.assignee && !this.board.matchMember(r.assignee)) names.add(r.assignee);
+    return [...names].sort((a, b) => a.localeCompare(b));
+  });
 
   protected readonly buttonText = computed(() => {
     const n = this.result().rows.length;

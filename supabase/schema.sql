@@ -7,6 +7,9 @@
 -- Para desarrollo conviene desactivar la confirmacion de correo:
 --   Authentication -> Sign In / Providers -> Email -> "Confirm email" off
 -- Si la dejas activa, cada cuenta nueva debe confirmar desde su correo.
+--
+-- Despues de este archivo corre perfil-y-permisos.sql (avatares,
+-- responsable por persona y los roles Dueno/Editor/Colaborador/Integrante).
 -- ============================================================
 
 drop table if exists tasks           cascade;

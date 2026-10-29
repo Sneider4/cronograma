@@ -242,7 +242,7 @@ type Sort = 'recent' | 'name' | 'progress' | 'due';
         <span class="dot" [style.background]="i.project.color"></span>
         <span class="atext">
           <span class="aname">{{ i.task.name }}</span>
-          <span class="aproj">{{ i.project.name }}{{ i.task.assignee ? ' · ' + i.task.assignee : '' }}</span>
+          <span class="aproj">{{ i.project.name }}{{ who(i) ? ' · ' + who(i) : '' }}</span>
         </span>
         <span class="when" [class.bad]="isLate(i)">{{ rel(i.task.end_date) }}</span>
       </a>
@@ -625,6 +625,10 @@ export class ProjectsPage implements OnInit {
     if (d < 0) return `Hace ${-d} d`;
     if (d <= 14) return `En ${d} d`;
     return formatDate(iso, false);
+  }
+
+  protected who(i: AgendaItem) {
+    return i.task.assignee_id && i.task.assignee_id === this.auth.user()?.id ? 'Tú' : i.task.assignee;
   }
 
   protected isLate(i: AgendaItem) {

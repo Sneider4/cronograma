@@ -43,6 +43,12 @@ export class CalendarView implements AfterViewInit, OnDestroy {
         this.calendar!.addEventSource(events);
       });
     });
+    // Solo el dueno mueve fechas o crea actividades desde el calendario.
+    effect(() => {
+      const owner = this.board.canEditAll();
+      this.calendar?.setOption('editable', owner);
+      this.calendar?.setOption('selectable', owner);
+    });
   }
 
   ngAfterViewInit() {
@@ -63,8 +69,8 @@ export class CalendarView implements AfterViewInit, OnDestroy {
       height: 'auto',
       firstDay: 1,
       dayMaxEvents: 4,
-      editable: true,
-      selectable: true,
+      editable: this.board.canEditAll(),
+      selectable: this.board.canEditAll(),
       eventDisplay: 'block',
       events: this.board.filteredTasks().map((t) => this.toEvent(t)),
       datesSet: (arg) => savePref(narrow ? 'calendar.view.m' : 'calendar.view', arg.view.type),

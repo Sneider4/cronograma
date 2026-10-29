@@ -1,6 +1,7 @@
 import { Component, ElementRef, HostListener, computed, effect, inject, input, signal, untracked, viewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 
+import { Avatar } from '../../components/avatar';
 import { CalendarView } from '../../components/calendar';
 import { Gantt } from '../../components/gantt';
 import { Icon, IconName } from '../../components/icon';
@@ -24,7 +25,7 @@ type View = 'gantt' | 'calendario' | 'kanban' | 'lista';
 
 @Component({
   selector: 'app-project',
-  imports: [RouterLink, Topbar, Icon, Gantt, CalendarView, Kanban, TaskList, TaskDialog, ImportDialog, SettingsDialog],
+  imports: [RouterLink, Topbar, Icon, Avatar, Gantt, CalendarView, Kanban, TaskList, TaskDialog, ImportDialog, SettingsDialog],
   providers: [BoardService],
   templateUrl: './project.html',
   styleUrl: './project.scss',
@@ -153,10 +154,13 @@ export class ProjectPage {
     const p = this.board.project();
     if (!p) return;
     if (!this.board.tasks().length) {
+      if (!this.board.canEditAll()) return this.toast.show('Aún no tienes actividades para exportar.', 'info');
       this.toast.show('El proyecto aún no tiene actividades. Te descargo la plantilla.', 'info');
       return this.downloadTemplate();
     }
-    await this.withExcel(() => this.excel.exportProject(p, this.board.objectives(), this.board.sortedTasks()));
+    // En el Excel va el nombre actual de cada responsable.
+    const tasks = this.board.sortedTasks().map((t) => ({ ...t, assignee: this.board.assigneeName(t) }));
+    await this.withExcel(() => this.excel.exportProject(p, this.board.objectives(), tasks));
   }
 
   protected async downloadTemplate() {

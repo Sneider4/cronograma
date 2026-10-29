@@ -12,6 +12,8 @@ export class AuthService {
     const u = this.user();
     return (u?.user_metadata?.['full_name'] as string | undefined) || u?.email || '';
   });
+  /** Clave del avatar (copia en los metadatos de la sesion para no consultar la tabla). */
+  readonly avatar = computed(() => (this.user()?.user_metadata?.['avatar'] as string | undefined) ?? '');
 
   /** Se resuelve cuando ya se sabe si hay sesion guardada. */
   readonly ready: Promise<void>;
@@ -52,6 +54,28 @@ export class AuthService {
   async updatePassword(password: string) {
     const { error } = await supabase.auth.updateUser({ password });
     if (error) throw error;
+  }
+
+  /**
+   * Nombre y avatar. Se guardan en la tabla profiles (la que ve el equipo)
+   * y en los metadatos de la sesion (los que lee la barra superior).
+   */
+  async updateProfile(fullName: string, avatar: string) {
+    const id = this.user()?.id;
+    if (!id) throw new Error('SIN_SESION');
+    const { error } = await supabase.from('profiles').update({ full_name: fullName, avatar }).eq('id', id);
+    if (error) throw error;
+    const { error: e2 } = await supabase.auth.updateUser({ data: { full_name: fullName, avatar } });
+    if (e2) throw e2;
+  }
+
+  /** Pide la contrasena actual antes de cambiarla, por si alguien usa la sesion abierta. */
+  async changePassword(current: string, next: string) {
+    const email = this.user()?.email;
+    if (!email) throw new Error('SIN_SESION');
+    const { error } = await supabase.auth.signInWithPassword({ email, password: current });
+    if (error) throw new Error('CONTRASENA_ACTUAL');
+    await this.updatePassword(next);
   }
 
   async signOut() {

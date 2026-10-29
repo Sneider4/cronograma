@@ -33,7 +33,7 @@ y avance como `50`, `50%` o `0,5` con formato de porcentaje.
 
 1. Crea un proyecto **nuevo** en [supabase.com](https://supabase.com). No reutilices el de otra app:
    el esquema define funciones como `is_member` que podrían chocar con las suyas.
-2. En **SQL Editor** pega y ejecuta [`supabase/schema.sql`](supabase/schema.sql).
+2. En **SQL Editor** pega y ejecuta [`supabase/schema.sql`](supabase/schema.sql) y luego [`supabase/perfil-y-permisos.sql`](supabase/perfil-y-permisos.sql).
 3. Para desarrollo: *Authentication → Sign In / Providers → Email* → desactiva **Confirm email**.
 4. Copia la URL y la *anon key* (*Project Settings → API*) en
    [`src/environments/environment.ts`](src/environments/environment.ts).

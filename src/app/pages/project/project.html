@@ -22,7 +22,7 @@
     <div class="inner">
       <div class="title-row">
         <div class="title">
-          <span class="tag" [style.color]="p.color">Proyecto · {{ board.members().length }} {{ board.members().length === 1 ? 'miembro' : 'miembros' }}</span>
+          <span class="tag" [style.color]="p.color">Proyecto · {{ board.members().length }} {{ board.members().length === 1 ? 'miembro' : 'miembros' }}{{ board.canSeeAll() ? '' : ' · Ves tus actividades' }}</span>
           <h1 class="fade-up">{{ p.name }}</h1>
           @if (p.description) {
             <p class="desc">{{ p.description }}</p>
@@ -31,7 +31,7 @@
         <div class="top-actions">
           <button class="avatars hide-sm" (click)="settingsTab.set('equipo')" title="Ver equipo">
             @for (m of board.members().slice(0, 4); track m.user_id) {
-              <span class="av" [title]="m.profile?.full_name ?? ''">{{ (m.profile?.full_name || '?')[0].toUpperCase() }}</span>
+              <app-avatar class="av" [avatar]="m.profile?.avatar" [name]="m.profile?.full_name || m.profile?.email" [size]="34" />
             }
             @if (board.members().length > 4) {
               <span class="av more">+{{ board.members().length - 4 }}</span>
@@ -68,22 +68,26 @@
                   <app-icon name="download" />
                   <span>Exportar a Excel<small>Actividades y cronograma por semanas</small></span>
                 </button>
-                <hr />
-                <button (click)="downloadTemplate()">
-                  <app-icon name="sheet" />
-                  <span>Descargar plantilla<small>Formato para cargar muchas actividades</small></span>
-                </button>
-                <button (click)="pickFile()">
-                  <app-icon name="upload" />
-                  <span>Importar Excel…<small>Sube la plantilla diligenciada (.xlsx)</small></span>
-                </button>
+                @if (board.canEditAll()) {
+                  <hr />
+                  <button (click)="downloadTemplate()">
+                    <app-icon name="sheet" />
+                    <span>Descargar plantilla<small>Formato para cargar muchas actividades</small></span>
+                  </button>
+                  <button (click)="pickFile()">
+                    <app-icon name="upload" />
+                    <span>Importar Excel…<small>Sube la plantilla diligenciada (.xlsx)</small></span>
+                  </button>
+                }
               </div>
             }
             <input #file type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden (change)="onFile($event)" />
           </div>
-          <button class="btn primary" (click)="board.newTask()">
-            Nueva actividad <span class="btn-go"><app-icon name="plus" [size]="15" /></span>
-          </button>
+          @if (board.canEditAll()) {
+            <button class="btn primary" (click)="board.newTask()">
+              Nueva actividad <span class="btn-go"><app-icon name="plus" [size]="15" /></span>
+            </button>
+          }
         </div>
       </div>
     </div>
@@ -125,11 +129,16 @@
         <div class="card panel rise-in" style="--delay: 380ms">
           <header class="panel-head">
             <h2>Objetivos</h2>
-            <button class="btn sm ghost" (click)="settingsTab.set('objetivos')">Editar</button>
+            @if (board.canEditAll()) {
+              <button class="btn sm ghost" (click)="settingsTab.set('objetivos')">Editar</button>
+            }
           </header>
           @if (!objectiveProgress().length) {
             <p class="small muted calm">
-              Aún no hay objetivos. <button class="textlink" (click)="settingsTab.set('objetivos')">Defínelos</button> para agrupar y colorear las actividades.
+              Aún no hay objetivos.
+              @if (board.canEditAll()) {
+                <button class="textlink" (click)="settingsTab.set('objetivos')">Defínelos</button> para agrupar y colorear las actividades.
+              }
             </p>
           }
           <div class="obj-list">
@@ -160,7 +169,7 @@
                 <span class="dot" [style.background]="board.colorOf(t)"></span>
                 <span class="utext">
                   <span class="uname">{{ t.name }}</span>
-                  <span class="umeta">{{ board.objectiveOf(t)?.code ?? 'Sin objetivo' }}{{ t.assignee ? ' · ' + t.assignee : '' }}</span>
+                  <span class="umeta">{{ board.objectiveOf(t)?.code ?? 'Sin objetivo' }}{{ board.assigneeName(t) ? ' · ' + board.assigneeName(t) : '' }}</span>
                 </span>
                 <span class="when" [class.bad]="t.end_date < today">{{ rel(t.end_date) }}</span>
               </button>
@@ -195,12 +204,15 @@
         }
         <option value="vencidas" [selected]="board.filters().status === 'vencidas'">Vencidas</option>
       </select>
-      <select class="select sm" [value]="board.filters().assignee" (change)="filter('assignee', $any($event.target).value)">
-        <option value="all">Todos los responsables</option>
-        @for (a of board.assignees(); track a) {
-          <option [value]="a" [selected]="a === board.filters().assignee">{{ a }}</option>
-        }
-      </select>
+      @if (board.canSeeAll()) {
+        <select class="select sm" [value]="board.filters().assignee" (change)="filter('assignee', $any($event.target).value)">
+          <option value="all">Todos los responsables</option>
+          @for (a of board.assignees(); track a.value) {
+            <option [value]="a.value" [selected]="a.value === board.filters().assignee">{{ a.name }}{{ a.member ? '' : ' (otra persona)' }}</option>
+          }
+          <option value="none" [selected]="board.filters().assignee === 'none'">Sin responsable</option>
+        </select>
+      }
       @if (board.hasFilters()) {
         <button class="btn sm ghost" (click)="board.resetFilters()"><app-icon name="x" [size]="14" /> Limpiar filtros</button>
       }
@@ -215,7 +227,13 @@
     </section>
 
     <!-- Vista -->
-    @if (!board.tasks().length && view() !== 'calendario') {
+    @if (!board.tasks().length && view() !== 'calendario' && !board.canEditAll()) {
+      <div class="card empty">
+        <span class="empty-icon"><app-icon name="user" [size]="22" /></span>
+        <h3>{{ board.canSeeAll() ? 'Este cronograma está vacío' : 'Aún no tienes actividades' }}</h3>
+        <p>{{ board.canSeeAll() ? 'Cuando el dueño o un editor agregue actividades, aparecerán aquí.' : 'Cuando te asignen actividades, aparecerán aquí. Solo ves las que están a tu cargo.' }}</p>
+      </div>
+    } @else if (!board.tasks().length && view() !== 'calendario') {
       <div class="card empty">
         <span class="empty-icon"><app-icon name="gantt" [size]="22" /></span>
         <h3>Este cronograma está vacío</h3>
