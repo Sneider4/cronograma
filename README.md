@@ -1,5 +1,9 @@
 # Cronograma · planeación en equipo
 
+**Demo:** [cronograma-xi.vercel.app](https://cronograma-xi.vercel.app) — entra con
+`demo@cronograma.app` / `demo1234`. Es una cuenta compartida para mirar la app; lo que
+escribas ahí lo ve cualquiera.
+
 Cronograma colaborativo en tiempo real. Cada proyecto tiene sus objetivos, su equipo
 y cuatro formas de ver las mismas actividades:
 
